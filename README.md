@@ -28,3 +28,42 @@ fetch()
 providers.json
  ↓
 renderizado DOM
+
+## Estado actual
+
+Commit 02:
+
+- estructura inicial;
+- tres páginas base;
+- estilos iniciales;
+- fuente de datos desacoplada en `data/providers.json`;
+- modelo de datos de proveedores;
+- documentación de pruebas de usuario.
+
+Todavía no están implementados:
+
+- carga dinámica con `fetch()`;
+- renderizado dinámico;
+- estados loading / empty / error;
+- filtros;
+- detalle dinámico;
+- Lighthouse;
+- pruebas de usuario;
+- deploy.
+
+## Modelo de proveedor
+
+Cada proveedor contiene:
+
+```json
+{
+  "id": 1,
+  "name": "Carlos Benítez",
+  "category": "Plomería",
+  "rating": 4.8,
+  "phone": "+595981111111",
+  "location": "Centro, Asunción",
+  "description": "Descripción del servicio.",
+  "experience": 9,
+  "available": true
+}

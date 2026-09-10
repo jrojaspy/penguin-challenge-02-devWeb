@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Carlos Benítez",
+    "category": "Plomería",
+    "rating": 4.8,
+    "phone": "+595981111111",
+    "location": "Centro, Asunción",
+    "description": "Servicios de plomería domiciliaria, reparación de cañerías, griferías y pérdidas de agua.",
+    "experience": 9,
+    "available": true
+  },
+  {
+    "id": 2,
+    "name": "María González",
+    "category": "Electricidad",
+    "rating": 4.9,
+    "phone": "+595982222222",
+    "location": "Villa Morra, Asunción",
+    "description": "Instalaciones eléctricas, reparación de tomas, iluminación y mantenimiento residencial.",
+    "experience": 7,
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Diego Martínez",
+    "category": "Plomería",
+    "rating": 4.5,
+    "phone": "+595983333333",
+    "location": "Sajonia, Asunción",
+    "description": "Mantenimiento sanitario, destape de cañerías y reparación de instalaciones de agua.",
+    "experience": 5,
+    "available": true
+  },
+  {
+    "id": 4,
+    "name": "Laura Fernández",
+    "category": "Aire acondicionado",
+    "rating": 4.7,
+    "phone": "+595984444444",
+    "location": "Las Mercedes, Asunción",
+    "description": "Instalación, limpieza y mantenimiento preventivo de equipos de aire acondicionado.",
+    "experience": 8,
+    "available": true
+  },
+  {
+    "id": 5,
+    "name": "José Ramírez",
+    "category": "Carpintería",
+    "rating": 4.3,
+    "phone": "+595985555555",
+    "location": "San Vicente, Asunción",
+    "description": "Fabricación y reparación de muebles, puertas, estantes y trabajos personalizados en madera.",
+    "experience": 12,
+    "available": false
+  },
+  {
+    "id": 6,
+    "name": "Ana López",
+    "category": "Limpieza",
+    "rating": 4.6,
+    "phone": "+595986666666",
+    "location": "Recoleta, Asunción",
+    "description": "Servicios de limpieza residencial, oficinas y limpieza profunda para mudanzas.",
+    "experience": 6,
+    "available": true
+  },
+  {
+    "id": 7,
+    "name": "Miguel Duarte",
+    "category": "Electricidad",
+    "rating": 4.4,
+    "phone": "+595987777777",
+    "location": "San Pablo, Asunción",
+    "description": "Diagnóstico de fallas eléctricas, instalación de luminarias y mantenimiento general.",
+    "experience": 10,
+    "available": true
+  },
+  {
+    "id": 8,
+    "name": "Sofía Acosta",
+    "category": "Jardinería",
+    "rating": 4.8,
+    "phone": "+595988888888",
+    "location": "Mburucuyá, Asunción",
+    "description": "Mantenimiento de jardines, poda, diseño de espacios verdes y cuidado de plantas.",
+    "experience": 4,
+    "available": true
+  }
+]
