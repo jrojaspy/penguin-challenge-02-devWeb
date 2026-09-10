@@ -67,3 +67,47 @@ Cada proveedor contiene:
   "experience": 9,
   "available": true
 }
+
+## Estado actual
+
+Commit 03:
+
+- estructura inicial;
+- tres páginas base;
+- estilos iniciales;
+- fuente de datos desacoplada en `data/providers.json`;
+- carga de proveedores mediante `fetch()`;
+- renderizado dinámico de tarjetas;
+- navegación preparada hacia detalle;
+- documentación de pruebas de usuario.
+
+Todavía no están implementados:
+
+- estados visuales loading / empty / error;
+- filtros por categoría;
+- detalle dinámico;
+- Lighthouse;
+- pruebas de usuario;
+- deploy.
+
+## Estado actual
+
+Commit 03:
+
+- estructura inicial;
+- tres páginas base;
+- estilos iniciales;
+- fuente de datos desacoplada en `data/providers.json`;
+- carga de proveedores mediante `fetch()`;
+- renderizado dinámico de tarjetas;
+- navegación preparada hacia detalle;
+- documentación de pruebas de usuario.
+
+Todavía no están implementados:
+
+- estados visuales loading / empty / error;
+- filtros por categoría;
+- detalle dinámico;
+- Lighthouse;
+- pruebas de usuario;
+- deploy.
