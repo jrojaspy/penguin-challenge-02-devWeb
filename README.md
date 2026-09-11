@@ -2,40 +2,48 @@
 
 ## Estado actual
 
-Commit 05:
+## Estado actual
 
-- estructura inicial;
-- tres páginas base;
+Commit 06:
+
+- tres páginas funcionales;
 - fuente de datos desacoplada;
 - carga mediante `fetch()`;
-- renderizado dinámico;
+- listado dinámico;
 - estados loading / empty / error;
 - filtro dinámico por categoría;
 - contador de resultados;
-- navegación preparada hacia detalle;
+- detalle dinámico del proveedor;
+- manejo de proveedor inexistente;
+- contacto funcional mediante `tel:`;
 - documentación de pruebas de usuario.
 
-Todavía no están implementados:
+Todavía no están completados:
 
-- detalle dinámico;
-- mejoras finales responsive;
-- auditoría Lighthouse;
-- pruebas de usuario;
+- ajustes finales responsive;
+- revisión de accesibilidad;
+- Lighthouse;
+- pruebas de usabilidad con cinco evaluadores;
+- mejoras derivadas del feedback;
 - deploy.
 
-## Filtro por categoría
+## Detalle de proveedor
 
-Las categorías no están hardcodeadas en HTML.
+Cada tarjeta enlaza a:
 
-Se obtienen dinámicamente a partir de:
+`detail.html?id=:id`
 
-`data/providers.json`
+La página obtiene el identificador mediante `URLSearchParams`, carga la misma fuente `providers.json` y localiza el proveedor correspondiente.
 
-mediante un `Set` de JavaScript.
+El detalle muestra:
 
-El filtro permite:
+- nombre;
+- categoría;
+- disponibilidad;
+- ubicación;
+- descripción;
+- rating;
+- experiencia;
+- contacto.
 
-- mostrar todos los proveedores;
-- filtrar por categoría;
-- actualizar el número de resultados;
-- mostrar un estado vacío cuando no existen coincidencias.
+Los proveedores disponibles muestran un enlace `tel:` para iniciar una llamada desde dispositivos compatibles.

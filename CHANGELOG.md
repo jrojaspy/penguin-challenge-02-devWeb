@@ -1,12 +1,13 @@
-
 ### Added
 
-- Filtro de proveedores por categoría.
-- Generación dinámica de categorías desde la fuente JSON.
-- Contador de resultados.
-- Estado vacío para filtros sin coincidencias.
+- Página dinámica de detalle de proveedor.
+- Lectura del identificador desde query string.
+- Estado de carga en detalle.
+- Manejo de proveedor inexistente.
+- Estado de error y acción de reintento.
+- Acción de contacto mediante enlaces `tel:`.
+- Presentación de rating, experiencia, categoría, ubicación y disponibilidad.
 
 ### Changed
 
-- El listado mantiene en memoria los proveedores cargados para permitir filtrado sin nuevas peticiones HTTP.
-- El filtro se deshabilita mientras los datos no están disponibles.
+- La página `detail.html` dejó de ser una plantilla estática y ahora consume la misma fuente desacoplada de proveedores.

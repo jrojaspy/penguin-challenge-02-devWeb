@@ -286,7 +286,6 @@ select:focus-visible {
 @media (max-width: 640px) {
   .header-content {
     flex-direction: column;
-
     align-items: flex-start;
 
     gap: 0.75rem;
@@ -295,6 +294,8 @@ select:focus-visible {
   }
 
   .main-nav {
+    width: 100%;
+
     flex-wrap: wrap;
   }
 
@@ -310,6 +311,43 @@ select:focus-visible {
 
   .filter-group {
     width: 100%;
+  }
+
+  .providers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .provider-card-header {
+    flex-direction: column;
+  }
+
+  .provider-meta {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .provider-detail-header {
+    flex-direction: column;
+  }
+
+  .provider-detail-list {
+    grid-template-columns: 1fr;
+  }
+
+  .provider-detail-header,
+  .provider-detail-section {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .provider-action,
+  .contact-button {
+    align-self: stretch;
   }
 }
 
@@ -572,4 +610,115 @@ select:focus-visible {
   color: var(--muted);
 
   font-size: 0.9rem;
+}
+
+/* Provider detail */
+
+.provider-detail-card {
+  overflow: hidden;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+}
+
+.provider-detail-header {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 1.5rem;
+
+  padding: 2rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.provider-detail-header h1 {
+  margin: 0.25rem 0 0;
+
+  font-size: clamp(
+    2rem,
+    6vw,
+    3rem
+  );
+}
+
+.provider-detail-location {
+  margin-bottom: 0;
+
+  color: var(--muted);
+}
+
+.provider-detail-section {
+  padding: 1.5rem 2rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.provider-detail-section:last-child {
+  border-bottom: 0;
+}
+
+.provider-detail-section h2 {
+  margin-top: 0;
+
+  font-size: 1.2rem;
+}
+
+.provider-detail-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 1rem;
+
+  margin: 0;
+}
+
+.provider-detail-list > div {
+  padding: 1rem;
+
+  background: var(--background);
+
+  border-radius: 8px;
+}
+
+.provider-detail-list dt {
+  margin-bottom: 0.3rem;
+
+  color: var(--muted);
+
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.provider-detail-list dd {
+  margin: 0;
+
+  font-weight: 600;
+}
+
+.contact-section {
+  background: #f8fafc;
+}
+
+.contact-button {
+  margin-top: 0.5rem;
+}
+
+.contact-phone {
+  margin-bottom: 0;
+
+  color: var(--muted);
+
+  font-size: 0.95rem;
 }
