@@ -301,6 +301,16 @@ select:focus-visible {
   .hero {
     padding: 3.5rem 0;
   }
+
+  .provider-controls {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
 }
 
 /* Providers */
@@ -494,4 +504,72 @@ select:focus-visible {
   .state-loading::before {
     animation: none;
   }
+}
+
+/* Provider controls */
+
+.provider-controls {
+  display: flex;
+
+  align-items: end;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-bottom: 1.5rem;
+
+  padding: 1rem;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.4rem;
+
+  width: min(
+    320px,
+    100%
+  );
+}
+
+.filter-group label {
+  font-weight: 700;
+}
+
+.filter-group select {
+  width: 100%;
+
+  min-height: 44px;
+
+  padding: 0.65rem 0.75rem;
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  background: white;
+  color: var(--text);
+
+  font: inherit;
+
+  cursor: pointer;
+}
+
+.filter-group select:hover {
+  border-color: #94a3b8;
+}
+
+.results-count {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 0.9rem;
 }

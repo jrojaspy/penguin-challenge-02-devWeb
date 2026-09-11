@@ -66,6 +66,35 @@
     </header>
 
     <section
+      class="provider-controls"
+      aria-labelledby="filter-title"
+    >
+      <div class="filter-group">
+        <label
+          id="filter-title"
+          for="category-filter"
+        >
+          Filtrar por categoría
+        </label>
+
+        <select
+          id="category-filter"
+          name="category"
+        >
+          <option value="all">
+            Todas las categorías
+          </option>
+        </select>
+      </div>
+
+      <p
+        id="results-count"
+        class="results-count"
+        aria-live="polite"
+      ></p>
+    </section>
+
+    <section
       aria-labelledby="providers-title"
     >
       <h2

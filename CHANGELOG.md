@@ -1,13 +1,12 @@
+
 ### Added
 
-- Estado visual de carga de proveedores.
-- Estado vacío cuando no existen proveedores.
-- Estado de error ante fallos de carga.
-- Acción para reintentar la petición.
-- Región `aria-live` para comunicar cambios de estado.
-- Compatibilidad con `prefers-reduced-motion`.
+- Filtro de proveedores por categoría.
+- Generación dinámica de categorías desde la fuente JSON.
+- Contador de resultados.
+- Estado vacío para filtros sin coincidencias.
 
 ### Changed
 
-- La carga de proveedores ahora valida la respuesta HTTP.
-- Se valida que la fuente de datos devuelva un arreglo.
+- El listado mantiene en memoria los proveedores cargados para permitir filtrado sin nuevas peticiones HTTP.
+- El filtro se deshabilita mientras los datos no están disponibles.
