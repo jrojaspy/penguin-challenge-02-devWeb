@@ -111,3 +111,49 @@ Todavía no están implementados:
 - Lighthouse;
 - pruebas de usuario;
 - deploy.
+
+## Estado actual
+
+Commit 04:
+
+- estructura inicial;
+- tres páginas base;
+- fuente de datos desacoplada;
+- carga mediante `fetch()`;
+- renderizado dinámico de proveedores;
+- estado de carga;
+- estado vacío;
+- estado de error;
+- opción para reintentar;
+- documentación de pruebas de usuario.
+
+Todavía no están implementados:
+
+- filtros por categoría;
+- detalle dinámico;
+- mejoras finales responsive;
+- auditoría Lighthouse;
+- pruebas con usuarios;
+- deploy.
+
+## Estados de carga
+
+El listado de proveedores maneja cuatro estados:
+
+### Loading
+
+Se muestra mientras se obtiene `providers.json`.
+
+### Success
+
+Se muestran las tarjetas generadas dinámicamente.
+
+### Empty
+
+Se muestra cuando la fuente devuelve un arreglo vacío.
+
+### Error
+
+Se muestra cuando la petición falla o devuelve una respuesta HTTP no válida.
+
+El estado de error incluye una acción para reintentar la carga.

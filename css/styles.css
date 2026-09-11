@@ -420,3 +420,78 @@ select:focus-visible {
 
   margin-top: auto;
 }
+
+/* Provider states */
+
+.providers-status {
+  margin-bottom: 1.5rem;
+}
+
+.state-card {
+  padding: 1.5rem;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+
+  text-align: center;
+}
+
+.state-title {
+  margin-top: 0;
+
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.state-description {
+  margin-bottom: 0;
+
+  color: var(--muted);
+}
+
+.state-error {
+  border-color: #fecaca;
+
+  background: #fef2f2;
+}
+
+.state-error .state-title {
+  color: #991b1b;
+}
+
+.state-error .button {
+  margin-top: 1rem;
+}
+
+.state-loading::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 28px;
+  height: 28px;
+
+  margin-bottom: 0.75rem;
+
+  border: 3px solid #cbd5e1;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+
+  animation: loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-loading::before {
+    animation: none;
+  }
+}

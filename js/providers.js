@@ -1,17 +1,36 @@
 const providersContainer =
   document.querySelector('#providers-container');
 
+const providersStatus =
+  document.querySelector('#providers-status');
+
 async function loadProviders() {
+  showLoadingState();
+
   try {
     const response = await fetch('./data/providers.json');
 
     if (!response.ok) {
       throw new Error(
-        `No se pudieron cargar los proveedores. HTTP ${response.status}`
+        `HTTP ${response.status}`
       );
     }
 
     const providers = await response.json();
+
+    if (!Array.isArray(providers)) {
+      throw new Error(
+        'La fuente de datos no contiene una lista válida.'
+      );
+    }
+
+    if (providers.length === 0) {
+      showEmptyState();
+
+      return;
+    }
+
+    clearStatus();
 
     renderProviders(providers);
   } catch (error) {
@@ -19,7 +38,81 @@ async function loadProviders() {
       'Error loading providers:',
       error
     );
+
+    showErrorState();
   }
+}
+
+function showLoadingState() {
+  providersContainer.innerHTML = '';
+
+  providersStatus.innerHTML = `
+    <div class="state-card state-loading">
+      <p class="state-title">
+        Cargando proveedores...
+      </p>
+
+      <p class="state-description">
+        Estamos obteniendo los servicios disponibles.
+      </p>
+    </div>
+  `;
+}
+
+function showEmptyState() {
+  providersContainer.innerHTML = '';
+
+  providersStatus.innerHTML = `
+    <div class="state-card state-empty">
+      <h2 class="state-title">
+        No hay proveedores disponibles
+      </h2>
+
+      <p class="state-description">
+        No encontramos proveedores para mostrar en este momento.
+      </p>
+    </div>
+  `;
+}
+
+function showErrorState() {
+  providersContainer.innerHTML = '';
+
+  providersStatus.innerHTML = `
+    <div
+      class="state-card state-error"
+      role="alert"
+    >
+      <h2 class="state-title">
+        No pudimos cargar los proveedores
+      </h2>
+
+      <p class="state-description">
+        Ocurrió un problema al obtener la información.
+        Puedes intentar nuevamente.
+      </p>
+
+      <button
+        class="button"
+        id="retry-providers"
+        type="button"
+      >
+        Reintentar
+      </button>
+    </div>
+  `;
+
+  const retryButton =
+    document.querySelector('#retry-providers');
+
+  retryButton.addEventListener(
+    'click',
+    loadProviders
+  );
+}
+
+function clearStatus() {
+  providersStatus.innerHTML = '';
 }
 
 function renderProviders(providers) {
@@ -33,9 +126,11 @@ function renderProviders(providers) {
 }
 
 function createProviderCard(provider) {
-  const article = document.createElement('article');
+  const article =
+    document.createElement('article');
 
-  article.className = 'provider-card';
+  article.className =
+    'provider-card';
 
   const statusText =
     provider.available
@@ -46,6 +141,14 @@ function createProviderCard(provider) {
     provider.available
       ? 'provider-status-available'
       : 'provider-status-unavailable';
+
+  const rating =
+    Number(provider.rating);
+
+  const safeRating =
+    Number.isFinite(rating)
+      ? rating
+      : 0;
 
   article.innerHTML = `
     <div class="provider-card-header">
@@ -77,9 +180,9 @@ function createProviderCard(provider) {
     <div class="provider-meta">
       <span
         class="provider-rating"
-        aria-label="Calificación ${provider.rating} de 5"
+        aria-label="Calificación ${safeRating} de 5"
       >
-        ★ ${provider.rating.toFixed(1)}
+        ★ ${safeRating.toFixed(1)}
       </span>
 
       <span>
