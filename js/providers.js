@@ -52,19 +52,22 @@ function loadProviders() {
 
       allProviders = providers;
 
-      populateCategoryFilter(
-        allProviders
-      );
+      allProviders =
+        providers.map(
+          function (provider) {
+            provider._searchText =
+              normalizeSearchText(
+                [
+                  provider.name,
+                  provider.category,
+                  provider.location,
+                  provider.description
+                ].join(' ')
+              );
 
-      if (
-        allProviders.length === 0
-      ) {
-        showEmptyState();
-
-        updateResultsCount(0);
-
-        return;
-      }
+            return provider;
+          }
+        );
 
       categoryFilter.disabled = false;
       providerSearch.disabled = false;
@@ -186,19 +189,9 @@ function applyFilters() {
           provider.category ===
             selectedCategory;
 
-        const searchableText =
-          normalizeSearchText(
-            [
-              provider.name,
-              provider.category,
-              provider.location,
-              provider.description
-            ].join(' ')
-          );
-
         const matchesSearch =
           searchTerm === '' ||
-          searchableText.indexOf(
+          provider._searchText.indexOf(
             searchTerm
           ) !== -1;
 

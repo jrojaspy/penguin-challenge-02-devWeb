@@ -1,28 +1,44 @@
-## Evaluación UX simulada
+## Lighthouse
 
-Antes de ejecutar la validación formal con usuarios reales se realizó una evaluación simulada con cinco perfiles de usuario.
+La aplicación se evalúa mediante Lighthouse en modo móvil.
 
-El recorrido evaluado fue:
+Las categorías revisadas son:
 
-`Inicio → Proveedores → Plomería → Perfil → Contacto`
+- Performance;
+- Accessibility;
+- Best Practices;
+- SEO.
 
-Los principales hallazgos simulados fueron:
+Las optimizaciones implementadas incluyen:
 
-- necesidad de búsqueda textual;
-- necesidad de una acción explícita para limpiar filtros;
-- preferencia por contacto mediante WhatsApp;
-- mayor claridad del texto "Ver perfil".
+- renderizado diferido de componentes fuera del viewport;
+- reducción del procesamiento durante búsquedas;
+- reserva de espacio durante carga para reducir cambios visuales;
+- uso de JavaScript con `defer`;
+- ausencia de frameworks y dependencias externas pesadas.
 
-Como consecuencia se implementaron:
+Los resultados se documentan en:
 
-- búsqueda por texto;
-- combinación de búsqueda y categoría;
-- botón "Limpiar filtros";
-- CTA "Ver perfil";
-- contacto por WhatsApp.
+`docs/lighthouse/LIGHTHOUSE_REPORT.md`
 
-La revisión se encuentra documentada en:
+Las puntuaciones se registran únicamente después de ejecutar la auditoría real.
 
-`docs/user-testing/SIMULATED_TEST_RESULTS.md`
+## Estado actual
 
-La evaluación simulada no sustituye las cinco pruebas con usuarios reales requeridas para la entrega.
+Commit 11:
+
+- tres páginas funcionales;
+- datos desacoplados;
+- búsqueda y filtrado;
+- contacto telefónico y WhatsApp;
+- responsive;
+- accesibilidad;
+- evaluación UX simulada;
+- optimizaciones de rendimiento;
+- documentación Lighthouse.
+
+Pendiente:
+
+- completar resultados reales de Lighthouse;
+- pruebas formales con cinco usuarios reales;
+- documentación final de entrega.

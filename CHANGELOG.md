@@ -1,24 +1,18 @@
-[Unreleased]
-
 ### Added
 
-- Búsqueda textual de proveedores.
-- Búsqueda por nombre, categoría, ubicación y descripción.
-- Normalización de búsquedas con y sin acentos.
-- Botón "Limpiar filtros".
-- Contacto mediante WhatsApp.
-- Documento de evaluación UX simulada.
+- Documentación de auditoría Lighthouse.
+- Metadatos adicionales de navegador.
+- Renderizado diferido mediante `content-visibility`.
+- Reserva mínima de espacio para contenido dinámico.
 
 ### Changed
 
-- La acción "Ver detalle" ahora utiliza el texto "Ver perfil".
-- El filtrado combina búsqueda textual y categoría.
-- Los controles de búsqueda y filtrado se adaptan a móvil y tablet.
-- La sección de contacto ofrece llamada telefónica y WhatsApp.
+- El texto normalizado utilizado por el buscador se genera una sola vez al cargar los proveedores.
+- Los recursos estáticos utilizan versión `v=11` durante la validación del commit.
+- Se mantuvo la carga diferida de JavaScript mediante `defer`.
 
-### Fixed
+### Performance
 
-- Falta de una acción explícita para restablecer filtros.
-- Limitación del filtrado exclusivamente por categoría.
-- Claridad del CTA de acceso al perfil.
-- Flexibilidad del proceso de búsqueda en dispositivos móviles.
+- Se redujo el procesamiento repetitivo durante búsquedas.
+- Se redujo el trabajo de renderizado inicial de tarjetas fuera del viewport.
+- Se minimizan cambios visuales durante la carga del listado.

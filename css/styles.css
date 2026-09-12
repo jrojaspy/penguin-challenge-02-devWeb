@@ -1130,3 +1130,22 @@ textarea:focus {
     animation: none;
   }
 }
+
+/* =========================
+   Performance
+   ========================= */
+
+.provider-card,
+.feature-card,
+.provider-detail-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 320px;
+}
+
+.providers-status {
+  min-height: 1px;
+}
+
+.providers-grid {
+  min-height: 120px;
+}
