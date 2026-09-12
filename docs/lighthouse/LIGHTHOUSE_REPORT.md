@@ -1,151 +1,66 @@
-# Lighthouse Report
+## Resultados Lighthouse
 
-## ServiPy — Reto 02
+Las auditorías fueron ejecutadas sobre la versión pública de GitHub Pages utilizando Lighthouse 13.4.1, emulación Moto G Power y limitación de red 4G lenta.
 
-Commit:
-
-`perf: apply lighthouse improvements`
-
-## Objetivo
-
-Evaluar la aplicación mediante Lighthouse e implementar mejoras reales de rendimiento y accesibilidad.
-
-## URL evaluada
-
-`https://jrojaspy.github.io/penguin-challenge-02-devWeb/`
-
-## Configuración
-
-- Lighthouse
-- Navigation
-- Mobile
-- Performance
-- Accessibility
-- Best Practices
-- SEO
-
----
-
-## Auditoría inicial
-
-### Inicio
+### Página de inicio
 
 | Categoría | Resultado |
 |---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
+| Performance | 100 |
+| Accessibility | 100 |
+| Best Practices | 100 |
+| SEO | 100 |
 
-### Proveedores
+Métricas principales:
 
-URL:
-
-`/providers.html`
-
-| Categoría | Resultado |
+| Métrica | Resultado |
 |---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
-
-### Detalle
-
-URL:
-
-`/detail.html?id=1`
-
-| Categoría | Resultado |
-|---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
-
----
-
-## Mejoras aplicadas
-
-### 1. Renderizado diferido
-
-Se incorporó:
-
-`content-visibility: auto`
-
-en componentes que pueden encontrarse fuera del viewport.
-
-Objetivo:
-
-Reducir trabajo inicial de renderizado.
-
-Fallback:
-
-Los navegadores que no soportan esta propiedad continúan mostrando el contenido normalmente.
-
-### 2. Optimización del filtrado
-
-El texto normalizado utilizado para búsquedas ahora se calcula una vez durante la carga de proveedores.
-
-Antes:
-
-Cada pulsación reconstruía y normalizaba nombre, categoría, ubicación y descripción.
-
-Después:
-
-Cada proveedor almacena previamente un texto de búsqueda normalizado.
-
-Objetivo:
-
-Reducir procesamiento durante la interacción.
-
-### 3. Reducción de cambios visuales
-
-El listado reserva espacio durante la carga para reducir movimientos de contenido.
-
-### 4. Scripts no bloqueantes
-
-Los scripts mantienen el atributo:
-
-`defer`
-
-para no bloquear el parseo inicial del HTML.
-
----
-
-## Auditoría posterior
-
-### Inicio
-
-| Categoría | Resultado |
-|---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
+| FCP | 0.8 s |
+| LCP | 0.8 s |
+| TBT | 0 ms |
+| CLS | 0 |
+| Speed Index | 0.8 s |
 
 ### Proveedores
 
 | Categoría | Resultado |
 |---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
+| Performance | 100 |
+| Accessibility | 100 |
+| Best Practices | 100 |
+| SEO | 100 |
 
-### Detalle
+Métricas principales:
+
+| Métrica | Resultado |
+|---|---:|
+| FCP | 0.8 s |
+| LCP | 0.8 s |
+| TBT | 0 ms |
+| CLS | 0.005 |
+| Speed Index | 0.8 s |
+
+### Detalle del proveedor
 
 | Categoría | Resultado |
 |---|---:|
-| Performance | Pendiente |
-| Accessibility | Pendiente |
-| Best Practices | Pendiente |
-| SEO | Pendiente |
+| Performance | 89 |
+| Accessibility | 100 |
+| Best Practices | 100 |
+| SEO | 100 |
 
----
+Métricas principales:
 
-## Evidencia
+| Métrica | Resultado |
+|---|---:|
+| FCP | 0.8 s |
+| LCP | 0.8 s |
+| TBT | 0 ms |
+| CLS | 0.217 |
+| Speed Index | 0.8 s |
 
-Los valores de este documento deben completarse únicamente con resultados obtenidos mediante Lighthouse.
+El principal problema detectado en la página de detalle fue el desplazamiento acumulado de diseño (CLS).
 
-No se utilizan puntuaciones simuladas.
+Lighthouse identificó el footer como principal causante del desplazamiento porque el contenido del proveedor se inserta dinámicamente después de la carga inicial.
+
+Para reducir este movimiento se reservó espacio para el contenido dinámico mediante `.detail-shell` y se estabilizó el layout vertical utilizando Flexbox.

@@ -27,7 +27,7 @@
 
   <link
     rel="stylesheet"
-    href="./css/styles.css?v=11"
+    href="./css/styles.css?v=11.1"
   >
 </head>
 
@@ -74,18 +74,23 @@
       ← Volver a proveedores
     </a>
 
-    <div
-      id="detail-status"
-      class="providers-status"
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    ></div>
+    <section
+      class="detail-shell"
+      aria-label="Información del proveedor"
+    >
+      <div
+        id="detail-status"
+        class="providers-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
 
-    <div
-      id="provider-detail"
-      aria-busy="true"
-    ></div>
+      <div
+        id="provider-detail"
+        aria-busy="true"
+      ></div>
+    </section>
   </main>
 
   <footer class="site-footer">

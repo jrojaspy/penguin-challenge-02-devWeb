@@ -42,7 +42,11 @@ html {
 body {
   margin: 0;
 
+  min-height: 100vh;
   max-width: 100%;
+
+  display: flex;
+  flex-direction: column;
 
   overflow-x: hidden;
 
@@ -885,15 +889,9 @@ textarea:focus {
    ========================= */
 
 @media (max-width: 640px) {
-  .header-content {
-    flex-direction: column;
-
-    align-items: stretch;
-
-    gap: 0.75rem;
-
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+  .detail-shell {
+    min-height: 760px;
+    }
   }
 
   .brand {
@@ -1046,7 +1044,7 @@ textarea:focus {
   .site-footer {
     padding: 1.5rem 0;
   }
-}
+
 
 /* =========================
    Tablet
@@ -1148,4 +1146,20 @@ textarea:focus {
 
 .providers-grid {
   min-height: 120px;
+}
+
+/* =========================
+   Detail layout stability
+   ========================= */
+
+.detail-shell {
+  min-height: 680px;
+}
+
+#provider-detail {
+  min-height: 1px;
+}
+
+main {
+  flex: 1;
 }
