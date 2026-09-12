@@ -1,37 +1,34 @@
-const providersContainer =
-  document.getElementById(
-    'providers-container'
-  );
+var detailContainer =
+  document.getElementById('provider-detail');
 
-const providersStatus =
-  document.getElementById(
-    'providers-status'
-  );
+var detailStatus =
+  document.getElementById('detail-status');
 
-const categoryFilter =
-  document.getElementById(
-    'category-filter'
-  );
+function initDetailPage() {
+  if (!detailContainer || !detailStatus) {
+    console.error(
+      'ServiPy: no se encontraron los contenedores del detalle.'
+    );
 
-const resultsCount =
-  document.getElementById(
-    'results-count'
-  );
+    return;
+  }
 
-const providerSearch =
-  document.getElementById(
-    'provider-search'
-  );
+  loadProviderDetail();
+}
 
-const clearFiltersButton =
-  document.getElementById(
-    'clear-filters'
-  );
-
-let allProviders = [];
-
-function loadProviders() {
+function loadProviderDetail() {
   showLoadingState();
+
+  var providerId =
+    getProviderIdFromUrl();
+
+  if (providerId === null) {
+    showNotFoundState(
+      'No se indicó un proveedor válido.'
+    );
+
+    return;
+  }
 
   fetch('./data/providers.json')
     .then(function (response) {
@@ -46,550 +43,549 @@ function loadProviders() {
     .then(function (providers) {
       if (!Array.isArray(providers)) {
         throw new Error(
-          'La fuente de datos no contiene una lista válida.'
+          'El archivo de proveedores no contiene una lista válida.'
         );
       }
 
-      allProviders = providers;
+      var provider =
+        findProviderById(
+          providers,
+          providerId
+        );
 
-      populateCategoryFilter(
-        allProviders
-      );
-
-      if (
-        allProviders.length === 0
-      ) {
-        showEmptyState();
-
-        updateResultsCount(0);
+      if (!provider) {
+        showNotFoundState(
+          'El proveedor solicitado no existe.'
+        );
 
         return;
       }
 
-      categoryFilter.disabled = false;
-      providerSearch.disabled = false;
-      clearFiltersButton.disabled = false;
+      clearStatus();
 
-      providersContainer.setAttribute(
+      detailContainer.setAttribute(
         'aria-busy',
         'false'
       );
 
-      clearStatus();
-
-      renderProviders(
-        allProviders
-      );
-
-      updateResultsCount(
-        allProviders.length
+      renderProviderDetail(
+        provider
       );
     })
     .catch(function (error) {
       console.error(
-        'Error loading providers:',
+        'ServiPy detail error:',
         error
       );
-
-      allProviders = [];
-
-      categoryFilter.disabled = true;
-      providerSearch.disabled = true;
-      clearFiltersButton.disabled = true;
-
-      updateResultsCount(0);
 
       showErrorState();
     });
 }
 
-function populateCategoryFilter(
-  providers
+/* =========================
+   Obtener ID
+   ========================= */
+
+function getProviderIdFromUrl() {
+  var query =
+    window.location.search;
+
+  if (!query) {
+    return null;
+  }
+
+  var parameters =
+    query.substring(1).split('&');
+
+  var rawId = null;
+
+  for (
+    var i = 0;
+    i < parameters.length;
+    i++
+  ) {
+    var pair =
+      parameters[i].split('=');
+
+    var key =
+      decodeURIComponent(
+        pair[0] || ''
+      );
+
+    if (key === 'id') {
+      rawId =
+        decodeURIComponent(
+          pair[1] || ''
+        );
+
+      break;
+    }
+  }
+
+  if (!rawId) {
+    return null;
+  }
+
+  var id =
+    parseInt(
+      rawId,
+      10
+    );
+
+  if (
+    isNaN(id) ||
+    id <= 0
+  ) {
+    return null;
+  }
+
+  return id;
+}
+
+/* =========================
+   Buscar proveedor
+   ========================= */
+
+function findProviderById(
+  providers,
+  providerId
 ) {
-  const categories = [];
-
-  providers.forEach(function (provider) {
-    const category =
-      normalizeText(
-        provider.category,
-        ''
-      );
-
+  for (
+    var i = 0;
+    i < providers.length;
+    i++
+  ) {
     if (
-      category &&
-      categories.indexOf(
-        category
-      ) === -1
+      Number(providers[i].id) ===
+      Number(providerId)
     ) {
-      categories.push(
-        category
-      );
+      return providers[i];
     }
-  });
-
-  categories.sort(
-    function (a, b) {
-      return a.localeCompare(
-        b,
-        'es'
-      );
-    }
-  );
-
-  categoryFilter.innerHTML = '';
-
-  const allOption =
-    document.createElement(
-      'option'
-    );
-
-  allOption.value = 'all';
-
-  allOption.textContent =
-    'Todas las categorías';
-
-  categoryFilter.appendChild(
-    allOption
-  );
-
-  categories.forEach(
-    function (category) {
-      const option =
-        document.createElement(
-          'option'
-        );
-
-      option.value = category;
-      option.textContent = category;
-
-      categoryFilter.appendChild(
-        option
-      );
-    }
-  );
-}
-
-function applyFilters() {
-  const selectedCategory =
-    categoryFilter.value;
-
-  const searchTerm =
-    normalizeSearchText(
-      providerSearch.value
-    );
-
-  const filteredProviders =
-    allProviders.filter(
-      function (provider) {
-        const matchesCategory =
-          selectedCategory === 'all' ||
-          provider.category ===
-            selectedCategory;
-
-        const searchableText =
-          normalizeSearchText(
-            [
-              provider.name,
-              provider.category,
-              provider.location,
-              provider.description
-            ].join(' ')
-          );
-
-        const matchesSearch =
-          searchTerm === '' ||
-          searchableText.indexOf(
-            searchTerm
-          ) !== -1;
-
-        return (
-          matchesCategory &&
-          matchesSearch
-        );
-      }
-    );
-
-  providersContainer.setAttribute(
-    'aria-busy',
-    'false'
-  );
-
-  if (
-    filteredProviders.length === 0
-  ) {
-    providersContainer.innerHTML = '';
-
-    showSearchEmptyState();
-
-    updateResultsCount(0);
-
-    return;
   }
 
-  clearStatus();
-
-  renderProviders(
-    filteredProviders
-  );
-
-  updateResultsCount(
-    filteredProviders.length
-  );
+  return null;
 }
 
-function clearFilters() {
-  categoryFilter.value = 'all';
+/* =========================
+   Render principal
+   ========================= */
 
-  providerSearch.value = '';
-
-  clearStatus();
-
-  renderProviders(
-    allProviders
-  );
-
-  updateResultsCount(
-    allProviders.length
-  );
-
-  providerSearch.focus();
-}
-
-function normalizeSearchText(value) {
-  let normalized =
-    String(value || '')
-      .toLowerCase();
-
-  if (
-    typeof normalized.normalize ===
-    'function'
-  ) {
-    normalized =
-      normalized.normalize('NFD')
-        .replace(
-          /[\u0300-\u036f]/g,
-          ''
-        );
-  }
-
-  return normalized.trim();
-}
-
-function showLoadingState() {
-  categoryFilter.disabled = true;
-  providerSearch.disabled = true;
-  clearFiltersButton.disabled = true;
-
-  providersContainer.setAttribute(
-    'aria-busy',
-    'true'
-  );
-
-  providersContainer.innerHTML = '';
-
-  resultsCount.textContent = '';
-
-  providersStatus.innerHTML =
-    '<div class="state-card state-loading">' +
-      '<p class="state-title">' +
-        'Cargando proveedores...' +
-      '</p>' +
-
-      '<p class="state-description">' +
-        'Estamos obteniendo los servicios disponibles.' +
-      '</p>' +
-    '</div>';
-}
-
-function showEmptyState() {
-  categoryFilter.disabled = true;
-  providerSearch.disabled = true;
-  clearFiltersButton.disabled = true;
-
-  providersContainer.setAttribute(
-    'aria-busy',
-    'false'
-  );
-
-  providersContainer.innerHTML = '';
-
-  providersStatus.innerHTML =
-    '<div class="state-card state-empty">' +
-      '<h2 class="state-title">' +
-        'No hay proveedores disponibles' +
-      '</h2>' +
-
-      '<p class="state-description">' +
-        'No encontramos proveedores para mostrar en este momento.' +
-      '</p>' +
-    '</div>';
-}
-
-function showSearchEmptyState() {
-  providersStatus.innerHTML =
-    '<div class="state-card state-empty">' +
-      '<h2 class="state-title">' +
-        'No encontramos coincidencias' +
-      '</h2>' +
-
-      '<p class="state-description">' +
-        'Prueba con otro nombre, servicio o categoría.' +
-      '</p>' +
-    '</div>';
-}
-
-function showErrorState() {
-  categoryFilter.disabled = true;
-  providerSearch.disabled = true;
-  clearFiltersButton.disabled = true;
-
-  providersContainer.setAttribute(
-    'aria-busy',
-    'false'
-  );
-
-  providersContainer.innerHTML = '';
-
-  providersStatus.innerHTML =
-    '<div ' +
-      'class="state-card state-error" ' +
-      'role="alert">' +
-
-      '<h2 class="state-title">' +
-        'No pudimos cargar los proveedores' +
-      '</h2>' +
-
-      '<p class="state-description">' +
-        'Ocurrió un problema al obtener la información. ' +
-        'Puedes intentar nuevamente.' +
-      '</p>' +
-
-      '<button ' +
-        'class="button" ' +
-        'id="retry-providers" ' +
-        'type="button">' +
-        'Reintentar' +
-      '</button>' +
-
-    '</div>';
-
-  const retryButton =
-    document.getElementById(
-      'retry-providers'
-    );
-
-  if (retryButton) {
-    retryButton.addEventListener(
-      'click',
-      loadProviders
-    );
-  }
-}
-
-function clearStatus() {
-  providersStatus.innerHTML = '';
-}
-
-function updateResultsCount(count) {
-  if (count === 0) {
-    resultsCount.textContent =
-      '0 proveedores encontrados';
-
-    return;
-  }
-
-  if (count === 1) {
-    resultsCount.textContent =
-      '1 proveedor encontrado';
-
-    return;
-  }
-
-  resultsCount.textContent =
-    count +
-    ' proveedores encontrados';
-}
-
-function renderProviders(providers) {
-  providersContainer.innerHTML = '';
-
-  const fragment =
-    document.createDocumentFragment();
-
-  providers.forEach(
-    function (provider) {
-      fragment.appendChild(
-        createProviderCard(
-          provider
-        )
-      );
-    }
-  );
-
-  providersContainer.appendChild(
-    fragment
-  );
-}
-
-function createProviderCard(provider) {
-  const article =
-    document.createElement(
-      'article'
-    );
-
-  article.className =
-    'provider-card';
-
-  const rawProviderId =
-    String(provider.id);
-
-  const providerId =
-    encodeURIComponent(
-      rawProviderId
-    );
-
-  const name =
+function renderProviderDetail(provider) {
+  var name =
     normalizeText(
       provider.name,
       'Proveedor'
     );
 
-  const category =
+  var category =
     normalizeText(
       provider.category,
       'Sin categoría'
     );
 
-  const location =
+  var location =
     normalizeText(
       provider.location,
       'Ubicación no informada'
     );
 
-  const description =
+  var description =
     normalizeText(
       provider.description,
       'Sin descripción disponible.'
     );
 
-  const experience =
-    normalizeExperience(
-      provider.experience
+  var phone =
+    normalizeText(
+      provider.phone,
+      ''
     );
 
-  const rating =
+  var rating =
     normalizeRating(
       provider.rating
     );
 
-  const available =
+  var experience =
+    normalizeExperience(
+      provider.experience
+    );
+
+  var available =
     provider.available === true;
 
-  const statusText =
+  var availabilityText =
     available
       ? 'Disponible'
       : 'No disponible';
 
-  const statusClass =
+  var availabilityClass =
     available
       ? 'provider-status-available'
       : 'provider-status-unavailable';
 
-  article.setAttribute(
-    'aria-labelledby',
-    'provider-name-' +
-      rawProviderId
-  );
+  document.title =
+    name + ' | ServiPy';
 
-  article.innerHTML =
-    '<div class="provider-card-header">' +
+  detailContainer.innerHTML =
+    '<article class="provider-detail-card">' +
 
-      '<div>' +
+      '<header class="provider-detail-header">' +
 
-        '<p class="provider-category">' +
-          escapeHtml(category) +
+        '<div>' +
+
+          '<p class="provider-category">' +
+            escapeHtml(category) +
+          '</p>' +
+
+          '<h1>' +
+            escapeHtml(name) +
+          '</h1>' +
+
+          '<p class="provider-detail-location">' +
+            escapeHtml(location) +
+          '</p>' +
+
+        '</div>' +
+
+        '<span ' +
+          'class="provider-status ' +
+          availabilityClass +
+          '" ' +
+          'aria-label="Estado del proveedor: ' +
+          escapeHtml(
+            availabilityText
+          ) +
+          '">' +
+
+          escapeHtml(
+            availabilityText
+          ) +
+
+        '</span>' +
+
+      '</header>' +
+
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="service-title">' +
+
+        '<h2 id="service-title">' +
+          'Sobre el servicio' +
+        '</h2>' +
+
+        '<p>' +
+          escapeHtml(
+            description
+          ) +
         '</p>' +
 
-        '<h2 ' +
-          'class="provider-name" ' +
-          'id="provider-name-' +
-          escapeHtml(rawProviderId) +
-          '">' +
-          escapeHtml(name) +
+      '</section>' +
+
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="info-title">' +
+
+        '<h2 id="info-title">' +
+          'Información del proveedor' +
         '</h2>' +
+
+        '<dl class="provider-detail-list">' +
+
+          '<div>' +
+            '<dt>Calificación</dt>' +
+            '<dd>' +
+              '★ ' +
+              rating.toFixed(1) +
+              ' / 5' +
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Experiencia</dt>' +
+            '<dd>' +
+              escapeHtml(
+                experience
+              ) +
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Categoría</dt>' +
+            '<dd>' +
+              escapeHtml(
+                category
+              ) +
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Ubicación</dt>' +
+            '<dd>' +
+              escapeHtml(
+                location
+              ) +
+            '</dd>' +
+          '</div>' +
+
+        '</dl>' +
+
+      '</section>' +
+
+      renderContactSection(
+        phone,
+        name,
+        available
+      ) +
+
+    '</article>';
+}
+
+/* =========================
+   Contacto
+   ========================= */
+
+function renderContactSection(
+  phone,
+  name,
+  available
+) {
+  if (!phone) {
+    return (
+      '<section ' +
+        'class="provider-detail-section">' +
+
+        '<h2>Contacto</h2>' +
+
+        '<p>' +
+          'No hay información de contacto disponible.' +
+        '</p>' +
+
+      '</section>'
+    );
+  }
+
+  var normalizedPhone =
+    normalizePhoneForLink(
+      phone
+    );
+
+  var whatsappPhone =
+    normalizedPhone.replace(
+      '+',
+      ''
+    );
+
+  if (!available) {
+    return (
+      '<section ' +
+        'class="provider-detail-section">' +
+
+        '<h2>Contacto</h2>' +
+
+        '<p>' +
+          'Este proveedor no se encuentra disponible en este momento.' +
+        '</p>' +
+
+        '<p class="contact-phone">' +
+          escapeHtml(
+            formatPhone(phone)
+          ) +
+        '</p>' +
+
+      '</section>'
+    );
+  }
+
+  return (
+    '<section ' +
+      'class="provider-detail-section contact-section">' +
+
+      '<h2>Contacto</h2>' +
+
+      '<p>' +
+        'Puedes contactar directamente con ' +
+        escapeHtml(name) +
+        '.' +
+      '</p>' +
+
+      '<div class="contact-actions">' +
+
+        '<a ' +
+          'class="button contact-button" ' +
+          'href="tel:' +
+          escapeHtml(
+            normalizedPhone
+          ) +
+          '" ' +
+          'aria-label="Llamar a ' +
+          escapeHtml(name) +
+          '">' +
+
+          'Llamar ahora' +
+
+        '</a>' +
+
+        '<a ' +
+          'class="button button-secondary contact-button" ' +
+          'href="https://wa.me/' +
+          escapeHtml(
+            whatsappPhone
+          ) +
+          '" ' +
+          'target="_blank" ' +
+          'rel="noopener noreferrer" ' +
+          'aria-label="Contactar por WhatsApp a ' +
+          escapeHtml(name) +
+          '">' +
+
+          'WhatsApp' +
+
+        '</a>' +
 
       '</div>' +
 
-      '<span ' +
-        'class="provider-status ' +
-        statusClass +
-        '" ' +
-        'aria-label="Estado del proveedor: ' +
-        escapeHtml(statusText) +
-        '">' +
-        escapeHtml(statusText) +
-      '</span>' +
+      '<p class="contact-phone">' +
+        escapeHtml(
+          formatPhone(phone)
+        ) +
+      '</p>' +
 
-    '</div>' +
-
-    '<p class="provider-location">' +
-      escapeHtml(location) +
-    '</p>' +
-
-    '<p class="provider-description">' +
-      escapeHtml(description) +
-    '</p>' +
-
-    '<div class="provider-meta">' +
-
-      '<span ' +
-        'class="provider-rating" ' +
-        'aria-label="Calificación ' +
-        rating.toFixed(1) +
-        ' de 5">' +
-        '★ ' +
-        rating.toFixed(1) +
-      '</span>' +
-
-      '<span>' +
-        escapeHtml(experience) +
-      '</span>' +
-
-    '</div>' +
-
-    '<a ' +
-      'class="button provider-action" ' +
-      'href="./detail.html?id=' +
-      providerId +
-      '" ' +
-      'aria-label="Ver perfil de ' +
-      escapeHtml(name) +
-      '">' +
-      'Ver perfil' +
-    '</a>';
-
-  return article;
+    '</section>'
+  );
 }
+
+/* =========================
+   Estados
+   ========================= */
+
+function showLoadingState() {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'true'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div class="state-card state-loading">' +
+
+      '<p class="state-title">' +
+        'Cargando proveedor...' +
+      '</p>' +
+
+      '<p class="state-description">' +
+        'Estamos obteniendo la información del servicio.' +
+      '</p>' +
+
+    '</div>';
+}
+
+function showNotFoundState(message) {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+
+      '<h1 class="state-title">' +
+        'Proveedor no encontrado' +
+      '</h1>' +
+
+      '<p class="state-description">' +
+        escapeHtml(message) +
+      '</p>' +
+
+      '<a ' +
+        'class="button" ' +
+        'href="./providers.html">' +
+
+        'Volver a proveedores' +
+
+      '</a>' +
+
+    '</div>';
+}
+
+function showErrorState() {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div ' +
+      'class="state-card state-error" ' +
+      'role="alert">' +
+
+      '<h1 class="state-title">' +
+        'No pudimos cargar el proveedor' +
+      '</h1>' +
+
+      '<p class="state-description">' +
+        'Ocurrió un problema al obtener los detalles del servicio.' +
+      '</p>' +
+
+      '<button ' +
+        'class="button" ' +
+        'id="retry-detail" ' +
+        'type="button">' +
+
+        'Reintentar' +
+
+      '</button>' +
+
+    '</div>';
+
+  var retryButton =
+    document.getElementById(
+      'retry-detail'
+    );
+
+  if (retryButton) {
+    retryButton.addEventListener(
+      'click',
+      loadProviderDetail
+    );
+  }
+}
+
+function clearStatus() {
+  detailStatus.innerHTML = '';
+}
+
+/* =========================
+   Normalización
+   ========================= */
 
 function normalizeText(
   value,
   fallback
 ) {
-  let normalized = '';
-
   if (
-    value !== null &&
-    value !== undefined
+    value === null ||
+    value === undefined
   ) {
-    normalized =
-      String(value).trim();
+    return fallback;
   }
 
-  return normalized || fallback;
+  var normalized =
+    String(value).trim();
+
+  return (
+    normalized ||
+    fallback
+  );
 }
 
 function normalizeRating(value) {
-  const rating =
+  var rating =
     Number(value);
 
   if (isNaN(rating)) {
@@ -608,7 +604,7 @@ function normalizeRating(value) {
 }
 
 function normalizeExperience(value) {
-  const experience =
+  var experience =
     Number(value);
 
   if (
@@ -618,62 +614,89 @@ function normalizeExperience(value) {
     return 'Experiencia no informada';
   }
 
-  const years =
-    Math.floor(experience);
+  var years =
+    Math.floor(
+      experience
+    );
+
+  if (years === 1) {
+    return '1 año';
+  }
 
   return (
     years +
-    ' ' +
-    (
-      years === 1
-        ? 'año'
-        : 'años'
-    ) +
-    ' de experiencia'
+    ' años'
   );
+}
+
+function normalizePhoneForLink(phone) {
+  return String(phone)
+    .replace(
+      /[^\d+]/g,
+      ''
+    );
+}
+
+function formatPhone(phone) {
+  var value =
+    String(phone).trim();
+
+  if (
+    value.indexOf('+595') === 0 &&
+    value.length >= 13
+  ) {
+    var country =
+      value.slice(0, 4);
+
+    var operator =
+      value.slice(4, 7);
+
+    var firstPart =
+      value.slice(7, 10);
+
+    var secondPart =
+      value.slice(10);
+
+    return (
+      country +
+      ' ' +
+      operator +
+      ' ' +
+      firstPart +
+      ' ' +
+      secondPart
+    );
+  }
+
+  return value;
 }
 
 function escapeHtml(value) {
   return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function initProvidersPage() {
-  if (
-    !providersContainer ||
-    !providersStatus ||
-    !categoryFilter ||
-    !resultsCount ||
-    !providerSearch ||
-    !clearFiltersButton
-  ) {
-    console.error(
-      'No se encontraron los elementos necesarios para inicializar proveedores.'
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
     );
-
-    return;
-  }
-
-  categoryFilter.addEventListener(
-    'change',
-    applyFilters
-  );
-
-  providerSearch.addEventListener(
-    'input',
-    applyFilters
-  );
-
-  clearFiltersButton.addEventListener(
-    'click',
-    clearFilters
-  );
-
-  loadProviders();
 }
 
-initProvidersPage();
+/* =========================
+   Inicio
+   ========================= */
+
+initDetailPage();
