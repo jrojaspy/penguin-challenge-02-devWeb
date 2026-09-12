@@ -17,11 +17,18 @@
 
   <link
     rel="stylesheet"
-    href="./css/styles.css?v=7"
+    href="./css/styles.css?v=8"
   >
 </head>
 
 <body>
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Saltar al contenido principal
+  </a>
+
   <header class="site-header">
     <div class="container header-content">
       <a
@@ -49,7 +56,10 @@
     </div>
   </header>
 
-  <main class="container section">
+  <main
+    id="main-content"
+    class="container section"
+  >
     <header class="page-header">
       <p class="eyebrow">
         Profesionales locales
@@ -80,17 +90,28 @@
         <select
           id="category-filter"
           name="category"
+          aria-describedby="filter-help"
         >
           <option value="all">
             Todas las categorías
           </option>
         </select>
+
+        <p
+          id="filter-help"
+          class="filter-help"
+        >
+          Selecciona una categoría para reducir
+          el listado de proveedores.
+        </p>
       </div>
 
       <p
         id="results-count"
         class="results-count"
+        role="status"
         aria-live="polite"
+        aria-atomic="true"
       ></p>
     </section>
 
@@ -109,11 +130,13 @@
         class="providers-status"
         role="status"
         aria-live="polite"
+        aria-atomic="true"
       ></div>
 
       <div
         id="providers-container"
         class="providers-grid"
+        aria-busy="true"
       ></div>
     </section>
   </main>
@@ -127,7 +150,7 @@
   </footer>
 
   <script
-    src="./js/providers.js?v=7"
+    src="./js/providers.js?v=8"
     defer
   ></script>
 </body>

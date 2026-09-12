@@ -17,11 +17,18 @@
 
   <link
     rel="stylesheet"
-    href="./css/styles.css?v=7"
+    href="./css/styles.css?v=8"
   >
 </head>
 
 <body>
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Saltar al contenido principal
+  </a>
+
   <header class="site-header">
     <div class="container header-content">
       <a
@@ -46,7 +53,10 @@
     </div>
   </header>
 
-  <main class="container section">
+  <main
+    id="main-content"
+    class="container section"
+  >
     <a
       class="back-link"
       href="./providers.html"
@@ -57,10 +67,15 @@
     <div
       id="detail-status"
       class="providers-status"
+      role="status"
       aria-live="polite"
+      aria-atomic="true"
     ></div>
 
-    <div id="provider-detail"></div>
+    <div
+      id="provider-detail"
+      aria-busy="true"
+    ></div>
   </main>
 
   <footer class="site-footer">
@@ -72,7 +87,7 @@
   </footer>
 
   <script
-    src="./js/detail.js?v=7"
+    src="./js/detail.js?v=8"
     defer
   ></script>
 </body>

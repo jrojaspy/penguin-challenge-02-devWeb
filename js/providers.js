@@ -13,10 +13,6 @@ const resultsCount =
 let allProviders = [];
 
 async function loadProviders() {
-  console.log(
-    'ServiPy: iniciando carga de proveedores'
-  );
-
   showLoadingState();
 
   try {
@@ -25,7 +21,7 @@ async function loadProviders() {
 
     if (!response.ok) {
       throw new Error(
-        `Error HTTP ${response.status}`
+        'Error HTTP ' + response.status
       );
     }
 
@@ -38,11 +34,6 @@ async function loadProviders() {
       );
     }
 
-    console.log(
-      'ServiPy: proveedores cargados',
-      providers.length
-    );
-
     allProviders = providers;
 
     populateCategoryFilter(
@@ -51,14 +42,18 @@ async function loadProviders() {
 
     if (allProviders.length === 0) {
       showEmptyState();
-      updateResultsCount(0);
 
-      categoryFilter.disabled = true;
+      updateResultsCount(0);
 
       return;
     }
 
     categoryFilter.disabled = false;
+
+    providersContainer.setAttribute(
+      'aria-busy',
+      'false'
+    );
 
     clearStatus();
 
@@ -91,7 +86,7 @@ function populateCategoryFilter(providers) {
 
   const categories = [];
 
-  providers.forEach((provider) => {
+  providers.forEach(function (provider) {
     const category =
       normalizeText(
         provider.category,
@@ -119,6 +114,7 @@ function populateCategoryFilter(providers) {
     document.createElement('option');
 
   allOption.value = 'all';
+
   allOption.textContent =
     'Todas las categorías';
 
@@ -131,6 +127,7 @@ function populateCategoryFilter(providers) {
       document.createElement('option');
 
     option.value = category;
+
     option.textContent = category;
 
     categoryFilter.appendChild(
@@ -181,6 +178,11 @@ function handleCategoryChange(event) {
       selectedCategory
     );
 
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
   if (
     filteredProviders.length === 0
   ) {
@@ -209,6 +211,11 @@ function handleCategoryChange(event) {
 function showLoadingState() {
   categoryFilter.disabled = true;
 
+  providersContainer.setAttribute(
+    'aria-busy',
+    'true'
+  );
+
   providersContainer.innerHTML = '';
 
   resultsCount.textContent = '';
@@ -228,6 +235,11 @@ function showLoadingState() {
 
 function showEmptyState() {
   categoryFilter.disabled = true;
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
 
   providersContainer.innerHTML = '';
 
@@ -265,6 +277,11 @@ function showFilteredEmptyState(
 
 function showErrorState() {
   categoryFilter.disabled = true;
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
 
   providersContainer.innerHTML = '';
 
@@ -358,6 +375,14 @@ function createProviderCard(provider) {
   article.className =
     'provider-card';
 
+  const rawProviderId =
+    String(provider.id);
+
+  const providerId =
+    encodeURIComponent(
+      rawProviderId
+    );
+
   const name =
     normalizeText(
       provider.name,
@@ -405,10 +430,10 @@ function createProviderCard(provider) {
       ? 'provider-status-available'
       : 'provider-status-unavailable';
 
-  const providerId =
-    encodeURIComponent(
-      String(provider.id)
-    );
+  article.setAttribute(
+    'aria-labelledby',
+    'provider-name-' + rawProviderId
+  );
 
   article.innerHTML = `
     <div class="provider-card-header">
@@ -417,13 +442,17 @@ function createProviderCard(provider) {
           ${escapeHtml(category)}
         </p>
 
-        <h2 class="provider-name">
+        <h2
+          class="provider-name"
+          id="provider-name-${escapeHtml(rawProviderId)}"
+        >
           ${escapeHtml(name)}
         </h2>
       </div>
 
       <span
         class="provider-status ${statusClass}"
+        aria-label="Estado del proveedor: ${statusText}"
       >
         ${statusText}
       </span>

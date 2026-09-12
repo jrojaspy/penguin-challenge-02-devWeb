@@ -3,7 +3,7 @@
   --surface: #ffffff;
 
   --text: #1e293b;
-  --muted: #64748b;
+  --muted: #475569;
 
   --primary: #0f172a;
   --primary-hover: #1e293b;
@@ -22,6 +22,10 @@
     0 4px 16px
     rgba(15, 23, 42, 0.06);
 }
+
+/* =========================
+   Base
+   ========================= */
 
 * {
   box-sizing: border-box;
@@ -70,15 +74,6 @@ video {
   max-width: 100%;
 }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: 3px;
-}
-
 .container {
   width: calc(100% - 2rem);
   max-width: 1120px;
@@ -87,7 +82,100 @@ textarea:focus-visible {
   margin-right: auto;
 }
 
-/* Header */
+/* =========================
+   Accessibility
+   ========================= */
+
+.skip-link {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  z-index: 9999;
+
+  padding: 0.75rem 1rem;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  border: 2px solid #0f172a;
+  border-radius: 0 0 8px 0;
+
+  font-weight: 700;
+
+  text-decoration: none;
+
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+@supports selector(:focus-visible) {
+  a:focus:not(:focus-visible),
+  button:focus:not(:focus-visible),
+  input:focus:not(:focus-visible),
+  select:focus:not(:focus-visible),
+  textarea:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+  }
+
+  .main-nav a:focus-visible,
+  .button:focus-visible {
+    outline-color: #60a5fa;
+  }
+}
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+[aria-busy="true"] {
+  cursor: progress;
+}
+
+.state-card [tabindex="-1"]:focus {
+  outline: 3px solid #2563eb;
+  outline-offset: 4px;
+}
+
+/* =========================
+   Header
+   ========================= */
 
 .site-header {
   background: var(--primary);
@@ -117,21 +205,42 @@ textarea:focus-visible {
 .main-nav {
   display: flex;
 
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .main-nav a {
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 44px;
+
+  padding: 0.4rem 0.5rem;
+
+  border-radius: 6px;
+
   color: white;
 
   text-decoration: none;
 }
 
-.main-nav a:hover,
-.main-nav a[aria-current="page"] {
+.main-nav a:hover {
   text-decoration: underline;
+
+  text-underline-offset: 4px;
 }
 
-/* Hero */
+.main-nav a[aria-current="page"] {
+  font-weight: 700;
+
+  text-decoration: underline;
+
+  text-underline-offset: 4px;
+}
+
+/* =========================
+   Hero
+   ========================= */
 
 .hero {
   padding: 5rem 0;
@@ -181,7 +290,9 @@ textarea:focus-visible {
   font-size: 1.1rem;
 }
 
-/* Buttons */
+/* =========================
+   Buttons
+   ========================= */
 
 .button {
   display: inline-flex;
@@ -210,7 +321,9 @@ textarea:focus-visible {
   background: var(--primary-hover);
 }
 
-/* Sections */
+/* =========================
+   Sections
+   ========================= */
 
 .section {
   padding-top: 3rem;
@@ -238,7 +351,9 @@ textarea:focus-visible {
   color: var(--muted);
 }
 
-/* Feature cards */
+/* =========================
+   Homepage feature cards
+   ========================= */
 
 .feature-grid {
   display: flex;
@@ -280,7 +395,9 @@ textarea:focus-visible {
   margin-top: 0;
 }
 
-/* Controls */
+/* =========================
+   Provider controls
+   ========================= */
 
 .provider-controls {
   display: flex;
@@ -332,12 +449,24 @@ textarea:focus-visible {
   cursor: pointer;
 }
 
+.filter-group select:hover {
+  border-color: #64748b;
+}
+
 .filter-group select:disabled {
   cursor: not-allowed;
 
   opacity: 0.6;
 
   background: #f1f5f9;
+}
+
+.field-help {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 0.85rem;
 }
 
 .results-count {
@@ -348,7 +477,9 @@ textarea:focus-visible {
   font-size: 0.9rem;
 }
 
-/* Providers */
+/* =========================
+   Provider grid
+   ========================= */
 
 .providers-grid {
   display: flex;
@@ -388,6 +519,10 @@ textarea:focus-visible {
     flex: initial;
   }
 }
+
+/* =========================
+   Provider cards
+   ========================= */
 
 .provider-card-header {
   display: flex;
@@ -479,7 +614,9 @@ textarea:focus-visible {
   margin-top: auto;
 }
 
-/* States */
+/* =========================
+   Dynamic states
+   ========================= */
 
 .providers-status {
   margin-bottom: 1.5rem;
@@ -546,18 +683,27 @@ textarea:focus-visible {
   }
 }
 
-/* Detail */
+/* =========================
+   Provider detail
+   ========================= */
 
 .back-link {
-  display: inline-block;
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 44px;
 
   margin-bottom: 1rem;
 
-  text-decoration: none;
+  font-weight: 600;
+
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .back-link:hover {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 .provider-detail-card {
@@ -670,6 +816,10 @@ textarea:focus-visible {
   font-size: 0.95rem;
 }
 
+/* =========================
+   Long text protection
+   ========================= */
+
 .provider-name,
 .provider-description,
 .provider-detail-header h1,
@@ -679,7 +829,9 @@ textarea:focus-visible {
   word-wrap: break-word;
 }
 
-/* Footer */
+/* =========================
+   Footer
+   ========================= */
 
 .site-footer {
   padding: 2rem 0;
@@ -691,27 +843,10 @@ textarea:focus-visible {
   font-size: 0.9rem;
 }
 
-/* Accessibility */
-
-.sr-only {
-  position: absolute;
-
-  width: 1px;
-  height: 1px;
-
-  padding: 0;
-  margin: -1px;
-
-  overflow: hidden;
-
-  clip: rect(0, 0, 0, 0);
-
-  white-space: nowrap;
-
-  border: 0;
-}
-
-/* Mobile */
+/* =========================
+   Mobile
+   0–640 px
+   ========================= */
 
 @media (max-width: 640px) {
   .header-content {
@@ -788,6 +923,10 @@ textarea:focus-visible {
     min-height: 48px;
   }
 
+  .results-count {
+    text-align: left;
+  }
+
   .providers-grid {
     display: block;
   }
@@ -808,6 +947,8 @@ textarea:focus-visible {
     flex-direction: column;
 
     align-items: flex-start;
+
+    gap: 0.4rem;
   }
 
   .provider-action {
@@ -818,6 +959,8 @@ textarea:focus-visible {
 
   .provider-detail-header {
     flex-direction: column;
+
+    gap: 1rem;
   }
 
   .provider-detail-list {
@@ -834,6 +977,10 @@ textarea:focus-visible {
     width: 100%;
   }
 
+  .state-card {
+    padding: 1.25rem;
+  }
+
   .state-error .button {
     width: 100%;
   }
@@ -843,7 +990,10 @@ textarea:focus-visible {
   }
 }
 
-/* Tablet */
+/* =========================
+   Tablet
+   641–900 px
+   ========================= */
 
 @media (
   min-width: 641px
@@ -869,7 +1019,9 @@ textarea:focus-visible {
   }
 }
 
-/* Very small screens */
+/* =========================
+   Very small screens
+   ========================= */
 
 @media (max-width: 420px) {
   .container {
@@ -888,10 +1040,86 @@ textarea:focus-visible {
   }
 }
 
-/* Reduced motion */
+/* =========================
+   Reduced motion
+   ========================= */
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
   .state-loading::before {
     animation: none;
   }
+}
+
+/* Accessibility helpers */
+
+.skip-link {
+  position: absolute;
+
+  top: -100px;
+  left: 1rem;
+
+  z-index: 1000;
+
+  padding: 0.75rem 1rem;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  border: 2px solid #0f172a;
+  border-radius: 8px;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+@supports selector(:focus-visible) {
+  a:focus:not(:focus-visible),
+  button:focus:not(:focus-visible),
+  input:focus:not(:focus-visible),
+  select:focus:not(:focus-visible),
+  textarea:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+  }
+}
+
+.filter-help {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 0.85rem;
 }

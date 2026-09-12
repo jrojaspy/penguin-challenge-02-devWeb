@@ -1,363 +1,152 @@
-const providersContainer =
-  document.querySelector('#providers-container');
+const detailContainer =
+  document.getElementById('provider-detail');
 
-const providersStatus =
-  document.querySelector('#providers-status');
+const detailStatus =
+  document.getElementById('detail-status');
 
-const categoryFilter =
-  document.querySelector('#category-filter');
-
-const resultsCount =
-  document.querySelector('#results-count');
-
-let allProviders = [];
-
-async function loadProviders() {
-  console.log(
-    'ServiPy: iniciando carga de proveedores'
-  );
-
+function loadProviderDetail() {
   showLoadingState();
 
-  try {
-    const response =
-      await fetch('./data/providers.json');
+  const providerId =
+    getProviderIdFromUrl();
 
-    if (!response.ok) {
-      throw new Error(
-        `Error HTTP ${response.status}`
-      );
-    }
-
-    const providers =
-      await response.json();
-
-    if (!Array.isArray(providers)) {
-      throw new Error(
-        'La fuente de datos no contiene una lista válida.'
-      );
-    }
-
-    console.log(
-      'ServiPy: proveedores cargados',
-      providers.length
+  if (providerId === null) {
+    showNotFoundState(
+      'No se indicó un proveedor válido.'
     );
-
-    allProviders = providers;
-
-    populateCategoryFilter(
-      allProviders
-    );
-
-    if (allProviders.length === 0) {
-      showEmptyState();
-      updateResultsCount(0);
-
-      categoryFilter.disabled = true;
-
-      return;
-    }
-
-    categoryFilter.disabled = false;
-
-    clearStatus();
-
-    renderProviders(
-      allProviders
-    );
-
-    updateResultsCount(
-      allProviders.length
-    );
-  } catch (error) {
-    console.error(
-      'Error loading providers:',
-      error
-    );
-
-    allProviders = [];
-
-    categoryFilter.disabled = true;
-
-    updateResultsCount(0);
-
-    showErrorState();
-  }
-}
-
-function populateCategoryFilter(providers) {
-  const currentValue =
-    categoryFilter.value;
-
-  const categories = [];
-
-  providers.forEach((provider) => {
-    const category =
-      normalizeText(
-        provider.category,
-        ''
-      );
-
-    if (
-      category &&
-      categories.indexOf(category) === -1
-    ) {
-      categories.push(category);
-    }
-  });
-
-  categories.sort(function (a, b) {
-    return a.localeCompare(
-      b,
-      'es'
-    );
-  });
-
-  categoryFilter.innerHTML = '';
-
-  const allOption =
-    document.createElement('option');
-
-  allOption.value = 'all';
-  allOption.textContent =
-    'Todas las categorías';
-
-  categoryFilter.appendChild(
-    allOption
-  );
-
-  categories.forEach(function (category) {
-    const option =
-      document.createElement('option');
-
-    option.value = category;
-    option.textContent = category;
-
-    categoryFilter.appendChild(
-      option
-    );
-  });
-
-  if (
-    currentValue &&
-    (
-      currentValue === 'all' ||
-      categories.indexOf(
-        currentValue
-      ) !== -1
-    )
-  ) {
-    categoryFilter.value =
-      currentValue;
-  } else {
-    categoryFilter.value =
-      'all';
-  }
-}
-
-function filterProvidersByCategory(
-  category
-) {
-  if (category === 'all') {
-    return allProviders;
-  }
-
-  return allProviders.filter(
-    function (provider) {
-      return (
-        provider.category ===
-        category
-      );
-    }
-  );
-}
-
-function handleCategoryChange(event) {
-  const selectedCategory =
-    event.target.value;
-
-  const filteredProviders =
-    filterProvidersByCategory(
-      selectedCategory
-    );
-
-  if (
-    filteredProviders.length === 0
-  ) {
-    providersContainer.innerHTML = '';
-
-    showFilteredEmptyState(
-      selectedCategory
-    );
-
-    updateResultsCount(0);
 
     return;
   }
 
-  clearStatus();
+  fetch('./data/providers.json')
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error(
+          'HTTP ' + response.status
+        );
+      }
 
-  renderProviders(
-    filteredProviders
-  );
+      return response.json();
+    })
+    .then(function (providers) {
+      if (!Array.isArray(providers)) {
+        throw new Error(
+          'La fuente de datos no contiene una lista válida.'
+        );
+      }
 
-  updateResultsCount(
-    filteredProviders.length
-  );
-}
+      const provider =
+        findProviderById(
+          providers,
+          providerId
+        );
 
-function showLoadingState() {
-  categoryFilter.disabled = true;
+      if (!provider) {
+        showNotFoundState(
+          'El proveedor solicitado no existe.'
+        );
 
-  providersContainer.innerHTML = '';
+        return;
+      }
 
-  resultsCount.textContent = '';
+      detailContainer.setAttribute(
+        'aria-busy',
+        'false'
+      );
 
-  providersStatus.innerHTML = `
-    <div class="state-card state-loading">
-      <p class="state-title">
-        Cargando proveedores...
-      </p>
+      clearStatus();
 
-      <p class="state-description">
-        Estamos obteniendo los servicios disponibles.
-      </p>
-    </div>
-  `;
-}
-
-function showEmptyState() {
-  categoryFilter.disabled = true;
-
-  providersContainer.innerHTML = '';
-
-  providersStatus.innerHTML = `
-    <div class="state-card state-empty">
-      <h2 class="state-title">
-        No hay proveedores disponibles
-      </h2>
-
-      <p class="state-description">
-        No encontramos proveedores
-        para mostrar en este momento.
-      </p>
-    </div>
-  `;
-}
-
-function showFilteredEmptyState(
-  category
-) {
-  providersStatus.innerHTML = `
-    <div class="state-card state-empty">
-      <h2 class="state-title">
-        No encontramos proveedores
-      </h2>
-
-      <p class="state-description">
-        No hay proveedores disponibles
-        para la categoría
-        "${escapeHtml(category)}".
-      </p>
-    </div>
-  `;
-}
-
-function showErrorState() {
-  categoryFilter.disabled = true;
-
-  providersContainer.innerHTML = '';
-
-  providersStatus.innerHTML = `
-    <div
-      class="state-card state-error"
-      role="alert"
-    >
-      <h2 class="state-title">
-        No pudimos cargar los proveedores
-      </h2>
-
-      <p class="state-description">
-        Ocurrió un problema al obtener
-        la información.
-        Puedes intentar nuevamente.
-      </p>
-
-      <button
-        class="button"
-        id="retry-providers"
-        type="button"
-      >
-        Reintentar
-      </button>
-    </div>
-  `;
-
-  const retryButton =
-    document.querySelector(
-      '#retry-providers'
-    );
-
-  if (retryButton) {
-    retryButton.addEventListener(
-      'click',
-      loadProviders
-    );
-  }
-}
-
-function clearStatus() {
-  providersStatus.innerHTML = '';
-}
-
-function updateResultsCount(count) {
-  if (count === 0) {
-    resultsCount.textContent =
-      '0 proveedores encontrados';
-
-    return;
-  }
-
-  if (count === 1) {
-    resultsCount.textContent =
-      '1 proveedor encontrado';
-
-    return;
-  }
-
-  resultsCount.textContent =
-    count + ' proveedores encontrados';
-}
-
-function renderProviders(providers) {
-  providersContainer.innerHTML = '';
-
-  const fragment =
-    document.createDocumentFragment();
-
-  providers.forEach(function (provider) {
-    const card =
-      createProviderCard(
+      renderProviderDetail(
         provider
       );
+    })
+    .catch(function (error) {
+      console.error(
+        'Error loading provider detail:',
+        error
+      );
 
-    fragment.appendChild(card);
-  });
-
-  providersContainer.appendChild(
-    fragment
-  );
+      showErrorState();
+    });
 }
 
-function createProviderCard(provider) {
-  const article =
-    document.createElement(
-      'article'
+function getProviderIdFromUrl() {
+  const query =
+    window.location.search;
+
+  if (!query) {
+    return null;
+  }
+
+  const parameters =
+    query.substring(1).split('&');
+
+  let rawId = null;
+
+  for (
+    let i = 0;
+    i < parameters.length;
+    i += 1
+  ) {
+    const pair =
+      parameters[i].split('=');
+
+    const key =
+      decodeURIComponent(
+        pair[0] || ''
+      );
+
+    if (key === 'id') {
+      rawId =
+        decodeURIComponent(
+          pair[1] || ''
+        );
+
+      break;
+    }
+  }
+
+  if (!rawId) {
+    return null;
+  }
+
+  const id =
+    parseInt(
+      rawId,
+      10
     );
 
-  article.className =
-    'provider-card';
+  if (
+    isNaN(id) ||
+    id <= 0
+  ) {
+    return null;
+  }
 
+  return id;
+}
+
+function findProviderById(
+  providers,
+  providerId
+) {
+  for (
+    let i = 0;
+    i < providers.length;
+    i += 1
+  ) {
+    if (
+      Number(providers[i].id) ===
+      providerId
+    ) {
+      return providers[i];
+    }
+  }
+
+  return null;
+}
+
+function renderProviderDetail(provider) {
   const name =
     normalizeText(
       provider.name,
@@ -382,9 +171,10 @@ function createProviderCard(provider) {
       'Sin descripción disponible.'
     );
 
-  const experience =
-    normalizeExperience(
-      provider.experience
+  const phone =
+    normalizeText(
+      provider.phone,
+      ''
     );
 
   const rating =
@@ -392,86 +182,346 @@ function createProviderCard(provider) {
       provider.rating
     );
 
+  const experience =
+    normalizeExperience(
+      provider.experience
+    );
+
   const available =
     provider.available === true;
 
-  const statusText =
+  const availabilityText =
     available
       ? 'Disponible'
       : 'No disponible';
 
-  const statusClass =
+  const availabilityClass =
     available
       ? 'provider-status-available'
       : 'provider-status-unavailable';
 
-  const providerId =
-    encodeURIComponent(
-      String(provider.id)
+  document.title =
+    name + ' | ServiPy';
+
+  detailContainer.innerHTML =
+    '<article class="provider-detail-card">' +
+
+      '<header class="provider-detail-header">' +
+
+        '<div>' +
+
+          '<p class="provider-category">' +
+            escapeHtml(category) +
+          '</p>' +
+
+          '<h1>' +
+            escapeHtml(name) +
+          '</h1>' +
+
+          '<p class="provider-detail-location">' +
+            escapeHtml(location) +
+          '</p>' +
+
+        '</div>' +
+
+        '<span ' +
+          'class="provider-status ' +
+          availabilityClass +
+          '" ' +
+          'aria-label="Estado del proveedor: ' +
+          escapeHtml(
+            availabilityText
+          ) +
+          '">' +
+
+          escapeHtml(
+            availabilityText
+          ) +
+
+        '</span>' +
+
+      '</header>' +
+
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="provider-description-title">' +
+
+        '<h2 id="provider-description-title">' +
+          'Sobre el servicio' +
+        '</h2>' +
+
+        '<p>' +
+          escapeHtml(description) +
+        '</p>' +
+
+      '</section>' +
+
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="provider-info-title">' +
+
+        '<h2 id="provider-info-title">' +
+          'Información' +
+        '</h2>' +
+
+        '<dl class="provider-detail-list">' +
+
+          '<div>' +
+            '<dt>Calificación</dt>' +
+
+            '<dd aria-label="Calificación ' +
+              rating.toFixed(1) +
+              ' de 5">' +
+
+              '★ ' +
+              rating.toFixed(1) +
+              ' / 5' +
+
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Experiencia</dt>' +
+
+            '<dd>' +
+              escapeHtml(experience) +
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Categoría</dt>' +
+
+            '<dd>' +
+              escapeHtml(category) +
+            '</dd>' +
+          '</div>' +
+
+          '<div>' +
+            '<dt>Ubicación</dt>' +
+
+            '<dd>' +
+              escapeHtml(location) +
+            '</dd>' +
+          '</div>' +
+
+        '</dl>' +
+
+      '</section>' +
+
+      renderContactSection(
+        phone,
+        name,
+        available
+      ) +
+
+    '</article>';
+}
+
+function renderContactSection(
+  phone,
+  name,
+  available
+) {
+  if (!phone) {
+    return (
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="contact-title">' +
+
+        '<h2 id="contact-title">' +
+          'Contacto' +
+        '</h2>' +
+
+        '<p>' +
+          'El proveedor no tiene un número ' +
+          'de contacto disponible.' +
+        '</p>' +
+
+      '</section>'
+    );
+  }
+
+  if (!available) {
+    return (
+      '<section ' +
+        'class="provider-detail-section" ' +
+        'aria-labelledby="contact-title">' +
+
+        '<h2 id="contact-title">' +
+          'Contacto' +
+        '</h2>' +
+
+        '<p>' +
+          'Este proveedor no se encuentra ' +
+          'disponible en este momento.' +
+        '</p>' +
+
+        '<p class="contact-phone">' +
+          escapeHtml(
+            formatPhone(phone)
+          ) +
+        '</p>' +
+
+      '</section>'
+    );
+  }
+
+  return (
+    '<section ' +
+      'class="provider-detail-section contact-section" ' +
+      'aria-labelledby="contact-title">' +
+
+      '<h2 id="contact-title">' +
+        'Contacto' +
+      '</h2>' +
+
+      '<p>' +
+        'Puedes contactar directamente con ' +
+        escapeHtml(name) +
+        '.' +
+      '</p>' +
+
+      '<a ' +
+        'class="button contact-button" ' +
+        'href="tel:' +
+        escapeHtml(
+          normalizePhoneForLink(phone)
+        ) +
+        '" ' +
+        'aria-label="Llamar a ' +
+        escapeHtml(name) +
+        '">' +
+
+        'Llamar ahora' +
+
+      '</a>' +
+
+      '<p class="contact-phone">' +
+        escapeHtml(
+          formatPhone(phone)
+        ) +
+      '</p>' +
+
+    '</section>'
+  );
+}
+
+function showLoadingState() {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'true'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div class="state-card state-loading">' +
+
+      '<p class="state-title">' +
+        'Cargando proveedor...' +
+      '</p>' +
+
+      '<p class="state-description">' +
+        'Estamos obteniendo la información ' +
+        'del profesional.' +
+      '</p>' +
+
+    '</div>';
+}
+
+function showNotFoundState(message) {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+
+      '<h1 class="state-title">' +
+        'Proveedor no encontrado' +
+      '</h1>' +
+
+      '<p class="state-description">' +
+        escapeHtml(message) +
+      '</p>' +
+
+      '<a ' +
+        'class="button" ' +
+        'href="./providers.html">' +
+
+        'Volver a proveedores' +
+
+      '</a>' +
+
+    '</div>';
+}
+
+function showErrorState() {
+  detailContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  detailContainer.innerHTML = '';
+
+  detailStatus.innerHTML =
+    '<div ' +
+      'class="state-card state-error" ' +
+      'role="alert">' +
+
+      '<h1 class="state-title">' +
+        'No pudimos cargar el proveedor' +
+      '</h1>' +
+
+      '<p class="state-description">' +
+        'Ocurrió un problema al obtener ' +
+        'la información.' +
+      '</p>' +
+
+      '<button ' +
+        'class="button" ' +
+        'id="retry-detail" ' +
+        'type="button">' +
+
+        'Reintentar' +
+
+      '</button>' +
+
+    '</div>';
+
+  const retryButton =
+    document.getElementById(
+      'retry-detail'
     );
 
-  article.innerHTML = `
-    <div class="provider-card-header">
-      <div>
-        <p class="provider-category">
-          ${escapeHtml(category)}
-        </p>
+  if (retryButton) {
+    retryButton.addEventListener(
+      'click',
+      loadProviderDetail
+    );
+  }
+}
 
-        <h2 class="provider-name">
-          ${escapeHtml(name)}
-        </h2>
-      </div>
-
-      <span
-        class="provider-status ${statusClass}"
-      >
-        ${statusText}
-      </span>
-    </div>
-
-    <p class="provider-location">
-      ${escapeHtml(location)}
-    </p>
-
-    <p class="provider-description">
-      ${escapeHtml(description)}
-    </p>
-
-    <div class="provider-meta">
-      <span
-        class="provider-rating"
-        aria-label="Calificación ${rating.toFixed(1)} de 5"
-      >
-        ★ ${rating.toFixed(1)}
-      </span>
-
-      <span>
-        ${escapeHtml(experience)}
-      </span>
-    </div>
-
-    <a
-      class="button provider-action"
-      href="./detail.html?id=${providerId}"
-      aria-label="Ver detalle de ${escapeHtml(name)}"
-    >
-      Ver detalle
-    </a>
-  `;
-
-  return article;
+function clearStatus() {
+  detailStatus.innerHTML = '';
 }
 
 function normalizeText(
   value,
   fallback
 ) {
-  const normalized =
-    String(
-      value == null
-        ? ''
-        : value
-    ).trim();
+  let normalized = '';
+
+  if (
+    value !== null &&
+    value !== undefined
+  ) {
+    normalized =
+      String(value).trim();
+  }
 
   return normalized || fallback;
 }
@@ -480,17 +530,19 @@ function normalizeRating(value) {
   const rating =
     Number(value);
 
-  if (!isFinite(rating)) {
+  if (isNaN(rating)) {
     return 0;
   }
 
-  return Math.min(
-    Math.max(
-      rating,
-      0
-    ),
-    5
-  );
+  if (rating < 0) {
+    return 0;
+  }
+
+  if (rating > 5) {
+    return 5;
+  }
+
+  return rating;
 }
 
 function normalizeExperience(value) {
@@ -498,7 +550,7 @@ function normalizeExperience(value) {
     Number(value);
 
   if (
-    !isFinite(experience) ||
+    isNaN(experience) ||
     experience < 0
   ) {
     return 'Experiencia no informada';
@@ -507,16 +559,53 @@ function normalizeExperience(value) {
   const years =
     Math.floor(experience);
 
+  if (years === 1) {
+    return '1 año';
+  }
+
   return (
     years +
-    ' ' +
-    (
-      years === 1
-        ? 'año'
-        : 'años'
-    ) +
-    ' de experiencia'
+    ' años'
   );
+}
+
+function normalizePhoneForLink(phone) {
+  return String(phone)
+    .replace(/[^\d+]/g, '');
+}
+
+function formatPhone(phone) {
+  const value =
+    String(phone).trim();
+
+  if (
+    value.indexOf('+595') === 0 &&
+    value.length >= 13
+  ) {
+    const country =
+      value.slice(0, 4);
+
+    const operator =
+      value.slice(4, 7);
+
+    const firstPart =
+      value.slice(7, 10);
+
+    const secondPart =
+      value.slice(10);
+
+    return (
+      country +
+      ' ' +
+      operator +
+      ' ' +
+      firstPart +
+      ' ' +
+      secondPart
+    );
+  }
+
+  return value;
 }
 
 function escapeHtml(value) {
@@ -528,26 +617,19 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function initProvidersPage() {
+function initDetailPage() {
   if (
-    !providersContainer ||
-    !providersStatus ||
-    !categoryFilter ||
-    !resultsCount
+    !detailContainer ||
+    !detailStatus
   ) {
     console.error(
-      'No se encontraron los elementos necesarios para inicializar la página de proveedores.'
+      'ServiPy: no se encontraron los contenedores de detalle.'
     );
 
     return;
   }
 
-  categoryFilter.addEventListener(
-    'change',
-    handleCategoryChange
-  );
-
-  loadProviders();
+  loadProviderDetail();
 }
 
-initProvidersPage();
+initDetailPage();
