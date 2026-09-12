@@ -1,22 +1,37 @@
-const detailContainer =
-  document.getElementById('provider-detail');
+const providersContainer =
+  document.getElementById(
+    'providers-container'
+  );
 
-const detailStatus =
-  document.getElementById('detail-status');
+const providersStatus =
+  document.getElementById(
+    'providers-status'
+  );
 
-function loadProviderDetail() {
+const categoryFilter =
+  document.getElementById(
+    'category-filter'
+  );
+
+const resultsCount =
+  document.getElementById(
+    'results-count'
+  );
+
+const providerSearch =
+  document.getElementById(
+    'provider-search'
+  );
+
+const clearFiltersButton =
+  document.getElementById(
+    'clear-filters'
+  );
+
+let allProviders = [];
+
+function loadProviders() {
   showLoadingState();
-
-  const providerId =
-    getProviderIdFromUrl();
-
-  if (providerId === null) {
-    showNotFoundState(
-      'No se indicó un proveedor válido.'
-    );
-
-    return;
-  }
 
   fetch('./data/providers.json')
     .then(function (response) {
@@ -35,118 +50,404 @@ function loadProviderDetail() {
         );
       }
 
-      const provider =
-        findProviderById(
-          providers,
-          providerId
-        );
+      allProviders = providers;
 
-      if (!provider) {
-        showNotFoundState(
-          'El proveedor solicitado no existe.'
-        );
+      populateCategoryFilter(
+        allProviders
+      );
+
+      if (
+        allProviders.length === 0
+      ) {
+        showEmptyState();
+
+        updateResultsCount(0);
 
         return;
       }
 
-      detailContainer.setAttribute(
+      categoryFilter.disabled = false;
+      providerSearch.disabled = false;
+      clearFiltersButton.disabled = false;
+
+      providersContainer.setAttribute(
         'aria-busy',
         'false'
       );
 
       clearStatus();
 
-      renderProviderDetail(
-        provider
+      renderProviders(
+        allProviders
+      );
+
+      updateResultsCount(
+        allProviders.length
       );
     })
     .catch(function (error) {
       console.error(
-        'Error loading provider detail:',
+        'Error loading providers:',
         error
       );
+
+      allProviders = [];
+
+      categoryFilter.disabled = true;
+      providerSearch.disabled = true;
+      clearFiltersButton.disabled = true;
+
+      updateResultsCount(0);
 
       showErrorState();
     });
 }
 
-function getProviderIdFromUrl() {
-  const query =
-    window.location.search;
+function populateCategoryFilter(
+  providers
+) {
+  const categories = [];
 
-  if (!query) {
-    return null;
-  }
-
-  const parameters =
-    query.substring(1).split('&');
-
-  let rawId = null;
-
-  for (
-    let i = 0;
-    i < parameters.length;
-    i += 1
-  ) {
-    const pair =
-      parameters[i].split('=');
-
-    const key =
-      decodeURIComponent(
-        pair[0] || ''
+  providers.forEach(function (provider) {
+    const category =
+      normalizeText(
+        provider.category,
+        ''
       );
 
-    if (key === 'id') {
-      rawId =
-        decodeURIComponent(
-          pair[1] || ''
-        );
-
-      break;
+    if (
+      category &&
+      categories.indexOf(
+        category
+      ) === -1
+    ) {
+      categories.push(
+        category
+      );
     }
-  }
+  });
 
-  if (!rawId) {
-    return null;
-  }
+  categories.sort(
+    function (a, b) {
+      return a.localeCompare(
+        b,
+        'es'
+      );
+    }
+  );
 
-  const id =
-    parseInt(
-      rawId,
-      10
+  categoryFilter.innerHTML = '';
+
+  const allOption =
+    document.createElement(
+      'option'
     );
 
-  if (
-    isNaN(id) ||
-    id <= 0
-  ) {
-    return null;
-  }
+  allOption.value = 'all';
 
-  return id;
-}
+  allOption.textContent =
+    'Todas las categorías';
 
-function findProviderById(
-  providers,
-  providerId
-) {
-  for (
-    let i = 0;
-    i < providers.length;
-    i += 1
-  ) {
-    if (
-      Number(providers[i].id) ===
-      providerId
-    ) {
-      return providers[i];
+  categoryFilter.appendChild(
+    allOption
+  );
+
+  categories.forEach(
+    function (category) {
+      const option =
+        document.createElement(
+          'option'
+        );
+
+      option.value = category;
+      option.textContent = category;
+
+      categoryFilter.appendChild(
+        option
+      );
     }
-  }
-
-  return null;
+  );
 }
 
-function renderProviderDetail(provider) {
+function applyFilters() {
+  const selectedCategory =
+    categoryFilter.value;
+
+  const searchTerm =
+    normalizeSearchText(
+      providerSearch.value
+    );
+
+  const filteredProviders =
+    allProviders.filter(
+      function (provider) {
+        const matchesCategory =
+          selectedCategory === 'all' ||
+          provider.category ===
+            selectedCategory;
+
+        const searchableText =
+          normalizeSearchText(
+            [
+              provider.name,
+              provider.category,
+              provider.location,
+              provider.description
+            ].join(' ')
+          );
+
+        const matchesSearch =
+          searchTerm === '' ||
+          searchableText.indexOf(
+            searchTerm
+          ) !== -1;
+
+        return (
+          matchesCategory &&
+          matchesSearch
+        );
+      }
+    );
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  if (
+    filteredProviders.length === 0
+  ) {
+    providersContainer.innerHTML = '';
+
+    showSearchEmptyState();
+
+    updateResultsCount(0);
+
+    return;
+  }
+
+  clearStatus();
+
+  renderProviders(
+    filteredProviders
+  );
+
+  updateResultsCount(
+    filteredProviders.length
+  );
+}
+
+function clearFilters() {
+  categoryFilter.value = 'all';
+
+  providerSearch.value = '';
+
+  clearStatus();
+
+  renderProviders(
+    allProviders
+  );
+
+  updateResultsCount(
+    allProviders.length
+  );
+
+  providerSearch.focus();
+}
+
+function normalizeSearchText(value) {
+  let normalized =
+    String(value || '')
+      .toLowerCase();
+
+  if (
+    typeof normalized.normalize ===
+    'function'
+  ) {
+    normalized =
+      normalized.normalize('NFD')
+        .replace(
+          /[\u0300-\u036f]/g,
+          ''
+        );
+  }
+
+  return normalized.trim();
+}
+
+function showLoadingState() {
+  categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'true'
+  );
+
+  providersContainer.innerHTML = '';
+
+  resultsCount.textContent = '';
+
+  providersStatus.innerHTML =
+    '<div class="state-card state-loading">' +
+      '<p class="state-title">' +
+        'Cargando proveedores...' +
+      '</p>' +
+
+      '<p class="state-description">' +
+        'Estamos obteniendo los servicios disponibles.' +
+      '</p>' +
+    '</div>';
+}
+
+function showEmptyState() {
+  categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  providersContainer.innerHTML = '';
+
+  providersStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+      '<h2 class="state-title">' +
+        'No hay proveedores disponibles' +
+      '</h2>' +
+
+      '<p class="state-description">' +
+        'No encontramos proveedores para mostrar en este momento.' +
+      '</p>' +
+    '</div>';
+}
+
+function showSearchEmptyState() {
+  providersStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+      '<h2 class="state-title">' +
+        'No encontramos coincidencias' +
+      '</h2>' +
+
+      '<p class="state-description">' +
+        'Prueba con otro nombre, servicio o categoría.' +
+      '</p>' +
+    '</div>';
+}
+
+function showErrorState() {
+  categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
+
+  providersContainer.setAttribute(
+    'aria-busy',
+    'false'
+  );
+
+  providersContainer.innerHTML = '';
+
+  providersStatus.innerHTML =
+    '<div ' +
+      'class="state-card state-error" ' +
+      'role="alert">' +
+
+      '<h2 class="state-title">' +
+        'No pudimos cargar los proveedores' +
+      '</h2>' +
+
+      '<p class="state-description">' +
+        'Ocurrió un problema al obtener la información. ' +
+        'Puedes intentar nuevamente.' +
+      '</p>' +
+
+      '<button ' +
+        'class="button" ' +
+        'id="retry-providers" ' +
+        'type="button">' +
+        'Reintentar' +
+      '</button>' +
+
+    '</div>';
+
+  const retryButton =
+    document.getElementById(
+      'retry-providers'
+    );
+
+  if (retryButton) {
+    retryButton.addEventListener(
+      'click',
+      loadProviders
+    );
+  }
+}
+
+function clearStatus() {
+  providersStatus.innerHTML = '';
+}
+
+function updateResultsCount(count) {
+  if (count === 0) {
+    resultsCount.textContent =
+      '0 proveedores encontrados';
+
+    return;
+  }
+
+  if (count === 1) {
+    resultsCount.textContent =
+      '1 proveedor encontrado';
+
+    return;
+  }
+
+  resultsCount.textContent =
+    count +
+    ' proveedores encontrados';
+}
+
+function renderProviders(providers) {
+  providersContainer.innerHTML = '';
+
+  const fragment =
+    document.createDocumentFragment();
+
+  providers.forEach(
+    function (provider) {
+      fragment.appendChild(
+        createProviderCard(
+          provider
+        )
+      );
+    }
+  );
+
+  providersContainer.appendChild(
+    fragment
+  );
+}
+
+function createProviderCard(provider) {
+  const article =
+    document.createElement(
+      'article'
+    );
+
+  article.className =
+    'provider-card';
+
+  const rawProviderId =
+    String(provider.id);
+
+  const providerId =
+    encodeURIComponent(
+      rawProviderId
+    );
+
   const name =
     normalizeText(
       provider.name,
@@ -171,10 +472,9 @@ function renderProviderDetail(provider) {
       'Sin descripción disponible.'
     );
 
-  const phone =
-    normalizeText(
-      provider.phone,
-      ''
+  const experience =
+    normalizeExperience(
+      provider.experience
     );
 
   const rating =
@@ -182,331 +482,93 @@ function renderProviderDetail(provider) {
       provider.rating
     );
 
-  const experience =
-    normalizeExperience(
-      provider.experience
-    );
-
   const available =
     provider.available === true;
 
-  const availabilityText =
+  const statusText =
     available
       ? 'Disponible'
       : 'No disponible';
 
-  const availabilityClass =
+  const statusClass =
     available
       ? 'provider-status-available'
       : 'provider-status-unavailable';
 
-  document.title =
-    name + ' | ServiPy';
+  article.setAttribute(
+    'aria-labelledby',
+    'provider-name-' +
+      rawProviderId
+  );
 
-  detailContainer.innerHTML =
-    '<article class="provider-detail-card">' +
+  article.innerHTML =
+    '<div class="provider-card-header">' +
 
-      '<header class="provider-detail-header">' +
+      '<div>' +
 
-        '<div>' +
+        '<p class="provider-category">' +
+          escapeHtml(category) +
+        '</p>' +
 
-          '<p class="provider-category">' +
-            escapeHtml(category) +
-          '</p>' +
-
-          '<h1>' +
-            escapeHtml(name) +
-          '</h1>' +
-
-          '<p class="provider-detail-location">' +
-            escapeHtml(location) +
-          '</p>' +
-
-        '</div>' +
-
-        '<span ' +
-          'class="provider-status ' +
-          availabilityClass +
-          '" ' +
-          'aria-label="Estado del proveedor: ' +
-          escapeHtml(
-            availabilityText
-          ) +
+        '<h2 ' +
+          'class="provider-name" ' +
+          'id="provider-name-' +
+          escapeHtml(rawProviderId) +
           '">' +
-
-          escapeHtml(
-            availabilityText
-          ) +
-
-        '</span>' +
-
-      '</header>' +
-
-      '<section ' +
-        'class="provider-detail-section" ' +
-        'aria-labelledby="provider-description-title">' +
-
-        '<h2 id="provider-description-title">' +
-          'Sobre el servicio' +
+          escapeHtml(name) +
         '</h2>' +
 
-        '<p>' +
-          escapeHtml(description) +
-        '</p>' +
+      '</div>' +
 
-      '</section>' +
-
-      '<section ' +
-        'class="provider-detail-section" ' +
-        'aria-labelledby="provider-info-title">' +
-
-        '<h2 id="provider-info-title">' +
-          'Información' +
-        '</h2>' +
-
-        '<dl class="provider-detail-list">' +
-
-          '<div>' +
-            '<dt>Calificación</dt>' +
-
-            '<dd aria-label="Calificación ' +
-              rating.toFixed(1) +
-              ' de 5">' +
-
-              '★ ' +
-              rating.toFixed(1) +
-              ' / 5' +
-
-            '</dd>' +
-          '</div>' +
-
-          '<div>' +
-            '<dt>Experiencia</dt>' +
-
-            '<dd>' +
-              escapeHtml(experience) +
-            '</dd>' +
-          '</div>' +
-
-          '<div>' +
-            '<dt>Categoría</dt>' +
-
-            '<dd>' +
-              escapeHtml(category) +
-            '</dd>' +
-          '</div>' +
-
-          '<div>' +
-            '<dt>Ubicación</dt>' +
-
-            '<dd>' +
-              escapeHtml(location) +
-            '</dd>' +
-          '</div>' +
-
-        '</dl>' +
-
-      '</section>' +
-
-      renderContactSection(
-        phone,
-        name,
-        available
-      ) +
-
-    '</article>';
-}
-
-function renderContactSection(
-  phone,
-  name,
-  available
-) {
-  if (!phone) {
-    return (
-      '<section ' +
-        'class="provider-detail-section" ' +
-        'aria-labelledby="contact-title">' +
-
-        '<h2 id="contact-title">' +
-          'Contacto' +
-        '</h2>' +
-
-        '<p>' +
-          'El proveedor no tiene un número ' +
-          'de contacto disponible.' +
-        '</p>' +
-
-      '</section>'
-    );
-  }
-
-  if (!available) {
-    return (
-      '<section ' +
-        'class="provider-detail-section" ' +
-        'aria-labelledby="contact-title">' +
-
-        '<h2 id="contact-title">' +
-          'Contacto' +
-        '</h2>' +
-
-        '<p>' +
-          'Este proveedor no se encuentra ' +
-          'disponible en este momento.' +
-        '</p>' +
-
-        '<p class="contact-phone">' +
-          escapeHtml(
-            formatPhone(phone)
-          ) +
-        '</p>' +
-
-      '</section>'
-    );
-  }
-
-  return (
-    '<section ' +
-      'class="provider-detail-section contact-section" ' +
-      'aria-labelledby="contact-title">' +
-
-      '<h2 id="contact-title">' +
-        'Contacto' +
-      '</h2>' +
-
-      '<p>' +
-        'Puedes contactar directamente con ' +
-        escapeHtml(name) +
-        '.' +
-      '</p>' +
-
-      '<a ' +
-        'class="button contact-button" ' +
-        'href="tel:' +
-        escapeHtml(
-          normalizePhoneForLink(phone)
-        ) +
+      '<span ' +
+        'class="provider-status ' +
+        statusClass +
         '" ' +
-        'aria-label="Llamar a ' +
-        escapeHtml(name) +
+        'aria-label="Estado del proveedor: ' +
+        escapeHtml(statusText) +
         '">' +
+        escapeHtml(statusText) +
+      '</span>' +
 
-        'Llamar ahora' +
+    '</div>' +
 
-      '</a>' +
+    '<p class="provider-location">' +
+      escapeHtml(location) +
+    '</p>' +
 
-      '<p class="contact-phone">' +
-        escapeHtml(
-          formatPhone(phone)
-        ) +
-      '</p>' +
+    '<p class="provider-description">' +
+      escapeHtml(description) +
+    '</p>' +
 
-    '</section>'
-  );
-}
+    '<div class="provider-meta">' +
 
-function showLoadingState() {
-  detailContainer.setAttribute(
-    'aria-busy',
-    'true'
-  );
+      '<span ' +
+        'class="provider-rating" ' +
+        'aria-label="Calificación ' +
+        rating.toFixed(1) +
+        ' de 5">' +
+        '★ ' +
+        rating.toFixed(1) +
+      '</span>' +
 
-  detailContainer.innerHTML = '';
+      '<span>' +
+        escapeHtml(experience) +
+      '</span>' +
 
-  detailStatus.innerHTML =
-    '<div class="state-card state-loading">' +
+    '</div>' +
 
-      '<p class="state-title">' +
-        'Cargando proveedor...' +
-      '</p>' +
+    '<a ' +
+      'class="button provider-action" ' +
+      'href="./detail.html?id=' +
+      providerId +
+      '" ' +
+      'aria-label="Ver perfil de ' +
+      escapeHtml(name) +
+      '">' +
+      'Ver perfil' +
+    '</a>';
 
-      '<p class="state-description">' +
-        'Estamos obteniendo la información ' +
-        'del profesional.' +
-      '</p>' +
-
-    '</div>';
-}
-
-function showNotFoundState(message) {
-  detailContainer.setAttribute(
-    'aria-busy',
-    'false'
-  );
-
-  detailContainer.innerHTML = '';
-
-  detailStatus.innerHTML =
-    '<div class="state-card state-empty">' +
-
-      '<h1 class="state-title">' +
-        'Proveedor no encontrado' +
-      '</h1>' +
-
-      '<p class="state-description">' +
-        escapeHtml(message) +
-      '</p>' +
-
-      '<a ' +
-        'class="button" ' +
-        'href="./providers.html">' +
-
-        'Volver a proveedores' +
-
-      '</a>' +
-
-    '</div>';
-}
-
-function showErrorState() {
-  detailContainer.setAttribute(
-    'aria-busy',
-    'false'
-  );
-
-  detailContainer.innerHTML = '';
-
-  detailStatus.innerHTML =
-    '<div ' +
-      'class="state-card state-error" ' +
-      'role="alert">' +
-
-      '<h1 class="state-title">' +
-        'No pudimos cargar el proveedor' +
-      '</h1>' +
-
-      '<p class="state-description">' +
-        'Ocurrió un problema al obtener ' +
-        'la información.' +
-      '</p>' +
-
-      '<button ' +
-        'class="button" ' +
-        'id="retry-detail" ' +
-        'type="button">' +
-
-        'Reintentar' +
-
-      '</button>' +
-
-    '</div>';
-
-  const retryButton =
-    document.getElementById(
-      'retry-detail'
-    );
-
-  if (retryButton) {
-    retryButton.addEventListener(
-      'click',
-      loadProviderDetail
-    );
-  }
-}
-
-function clearStatus() {
-  detailStatus.innerHTML = '';
+  return article;
 }
 
 function normalizeText(
@@ -559,53 +621,16 @@ function normalizeExperience(value) {
   const years =
     Math.floor(experience);
 
-  if (years === 1) {
-    return '1 año';
-  }
-
   return (
     years +
-    ' años'
+    ' ' +
+    (
+      years === 1
+        ? 'año'
+        : 'años'
+    ) +
+    ' de experiencia'
   );
-}
-
-function normalizePhoneForLink(phone) {
-  return String(phone)
-    .replace(/[^\d+]/g, '');
-}
-
-function formatPhone(phone) {
-  const value =
-    String(phone).trim();
-
-  if (
-    value.indexOf('+595') === 0 &&
-    value.length >= 13
-  ) {
-    const country =
-      value.slice(0, 4);
-
-    const operator =
-      value.slice(4, 7);
-
-    const firstPart =
-      value.slice(7, 10);
-
-    const secondPart =
-      value.slice(10);
-
-    return (
-      country +
-      ' ' +
-      operator +
-      ' ' +
-      firstPart +
-      ' ' +
-      secondPart
-    );
-  }
-
-  return value;
 }
 
 function escapeHtml(value) {
@@ -617,19 +642,38 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function initDetailPage() {
+function initProvidersPage() {
   if (
-    !detailContainer ||
-    !detailStatus
+    !providersContainer ||
+    !providersStatus ||
+    !categoryFilter ||
+    !resultsCount ||
+    !providerSearch ||
+    !clearFiltersButton
   ) {
     console.error(
-      'ServiPy: no se encontraron los contenedores de detalle.'
+      'No se encontraron los elementos necesarios para inicializar proveedores.'
     );
 
     return;
   }
 
-  loadProviderDetail();
+  categoryFilter.addEventListener(
+    'change',
+    applyFilters
+  );
+
+  providerSearch.addEventListener(
+    'input',
+    applyFilters
+  );
+
+  clearFiltersButton.addEventListener(
+    'click',
+    clearFilters
+  );
+
+  loadProviders();
 }
 
-initDetailPage();
+initProvidersPage();

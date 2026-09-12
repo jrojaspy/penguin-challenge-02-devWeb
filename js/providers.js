@@ -1,89 +1,111 @@
 const providersContainer =
-  document.querySelector('#providers-container');
+  document.getElementById(
+    'providers-container'
+  );
 
 const providersStatus =
-  document.querySelector('#providers-status');
+  document.getElementById(
+    'providers-status'
+  );
 
 const categoryFilter =
-  document.querySelector('#category-filter');
+  document.getElementById(
+    'category-filter'
+  );
 
 const resultsCount =
-  document.querySelector('#results-count');
+  document.getElementById(
+    'results-count'
+  );
+
+const providerSearch =
+  document.getElementById(
+    'provider-search'
+  );
+
+const clearFiltersButton =
+  document.getElementById(
+    'clear-filters'
+  );
 
 let allProviders = [];
 
-async function loadProviders() {
+function loadProviders() {
   showLoadingState();
 
-  try {
-    const response =
-      await fetch('./data/providers.json');
+  fetch('./data/providers.json')
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error(
+          'HTTP ' + response.status
+        );
+      }
 
-    if (!response.ok) {
-      throw new Error(
-        'Error HTTP ' + response.status
+      return response.json();
+    })
+    .then(function (providers) {
+      if (!Array.isArray(providers)) {
+        throw new Error(
+          'La fuente de datos no contiene una lista válida.'
+        );
+      }
+
+      allProviders = providers;
+
+      populateCategoryFilter(
+        allProviders
       );
-    }
 
-    const providers =
-      await response.json();
+      if (
+        allProviders.length === 0
+      ) {
+        showEmptyState();
 
-    if (!Array.isArray(providers)) {
-      throw new Error(
-        'La fuente de datos no contiene una lista válida.'
+        updateResultsCount(0);
+
+        return;
+      }
+
+      categoryFilter.disabled = false;
+      providerSearch.disabled = false;
+      clearFiltersButton.disabled = false;
+
+      providersContainer.setAttribute(
+        'aria-busy',
+        'false'
       );
-    }
 
-    allProviders = providers;
+      clearStatus();
 
-    populateCategoryFilter(
-      allProviders
-    );
+      renderProviders(
+        allProviders
+      );
 
-    if (allProviders.length === 0) {
-      showEmptyState();
+      updateResultsCount(
+        allProviders.length
+      );
+    })
+    .catch(function (error) {
+      console.error(
+        'Error loading providers:',
+        error
+      );
+
+      allProviders = [];
+
+      categoryFilter.disabled = true;
+      providerSearch.disabled = true;
+      clearFiltersButton.disabled = true;
 
       updateResultsCount(0);
 
-      return;
-    }
-
-    categoryFilter.disabled = false;
-
-    providersContainer.setAttribute(
-      'aria-busy',
-      'false'
-    );
-
-    clearStatus();
-
-    renderProviders(
-      allProviders
-    );
-
-    updateResultsCount(
-      allProviders.length
-    );
-  } catch (error) {
-    console.error(
-      'Error loading providers:',
-      error
-    );
-
-    allProviders = [];
-
-    categoryFilter.disabled = true;
-
-    updateResultsCount(0);
-
-    showErrorState();
-  }
+      showErrorState();
+    });
 }
 
-function populateCategoryFilter(providers) {
-  const currentValue =
-    categoryFilter.value;
-
+function populateCategoryFilter(
+  providers
+) {
   const categories = [];
 
   providers.forEach(function (provider) {
@@ -95,23 +117,31 @@ function populateCategoryFilter(providers) {
 
     if (
       category &&
-      categories.indexOf(category) === -1
+      categories.indexOf(
+        category
+      ) === -1
     ) {
-      categories.push(category);
+      categories.push(
+        category
+      );
     }
   });
 
-  categories.sort(function (a, b) {
-    return a.localeCompare(
-      b,
-      'es'
-    );
-  });
+  categories.sort(
+    function (a, b) {
+      return a.localeCompare(
+        b,
+        'es'
+      );
+    }
+  );
 
   categoryFilter.innerHTML = '';
 
   const allOption =
-    document.createElement('option');
+    document.createElement(
+      'option'
+    );
 
   allOption.value = 'all';
 
@@ -122,60 +152,61 @@ function populateCategoryFilter(providers) {
     allOption
   );
 
-  categories.forEach(function (category) {
-    const option =
-      document.createElement('option');
+  categories.forEach(
+    function (category) {
+      const option =
+        document.createElement(
+          'option'
+        );
 
-    option.value = category;
+      option.value = category;
+      option.textContent = category;
 
-    option.textContent = category;
-
-    categoryFilter.appendChild(
-      option
-    );
-  });
-
-  if (
-    currentValue &&
-    (
-      currentValue === 'all' ||
-      categories.indexOf(
-        currentValue
-      ) !== -1
-    )
-  ) {
-    categoryFilter.value =
-      currentValue;
-  } else {
-    categoryFilter.value =
-      'all';
-  }
-}
-
-function filterProvidersByCategory(
-  category
-) {
-  if (category === 'all') {
-    return allProviders;
-  }
-
-  return allProviders.filter(
-    function (provider) {
-      return (
-        provider.category ===
-        category
+      categoryFilter.appendChild(
+        option
       );
     }
   );
 }
 
-function handleCategoryChange(event) {
+function applyFilters() {
   const selectedCategory =
-    event.target.value;
+    categoryFilter.value;
+
+  const searchTerm =
+    normalizeSearchText(
+      providerSearch.value
+    );
 
   const filteredProviders =
-    filterProvidersByCategory(
-      selectedCategory
+    allProviders.filter(
+      function (provider) {
+        const matchesCategory =
+          selectedCategory === 'all' ||
+          provider.category ===
+            selectedCategory;
+
+        const searchableText =
+          normalizeSearchText(
+            [
+              provider.name,
+              provider.category,
+              provider.location,
+              provider.description
+            ].join(' ')
+          );
+
+        const matchesSearch =
+          searchTerm === '' ||
+          searchableText.indexOf(
+            searchTerm
+          ) !== -1;
+
+        return (
+          matchesCategory &&
+          matchesSearch
+        );
+      }
     );
 
   providersContainer.setAttribute(
@@ -188,9 +219,7 @@ function handleCategoryChange(event) {
   ) {
     providersContainer.innerHTML = '';
 
-    showFilteredEmptyState(
-      selectedCategory
-    );
+    showSearchEmptyState();
 
     updateResultsCount(0);
 
@@ -208,8 +237,48 @@ function handleCategoryChange(event) {
   );
 }
 
+function clearFilters() {
+  categoryFilter.value = 'all';
+
+  providerSearch.value = '';
+
+  clearStatus();
+
+  renderProviders(
+    allProviders
+  );
+
+  updateResultsCount(
+    allProviders.length
+  );
+
+  providerSearch.focus();
+}
+
+function normalizeSearchText(value) {
+  let normalized =
+    String(value || '')
+      .toLowerCase();
+
+  if (
+    typeof normalized.normalize ===
+    'function'
+  ) {
+    normalized =
+      normalized.normalize('NFD')
+        .replace(
+          /[\u0300-\u036f]/g,
+          ''
+        );
+  }
+
+  return normalized.trim();
+}
+
 function showLoadingState() {
   categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
 
   providersContainer.setAttribute(
     'aria-busy',
@@ -220,21 +289,22 @@ function showLoadingState() {
 
   resultsCount.textContent = '';
 
-  providersStatus.innerHTML = `
-    <div class="state-card state-loading">
-      <p class="state-title">
-        Cargando proveedores...
-      </p>
+  providersStatus.innerHTML =
+    '<div class="state-card state-loading">' +
+      '<p class="state-title">' +
+        'Cargando proveedores...' +
+      '</p>' +
 
-      <p class="state-description">
-        Estamos obteniendo los servicios disponibles.
-      </p>
-    </div>
-  `;
+      '<p class="state-description">' +
+        'Estamos obteniendo los servicios disponibles.' +
+      '</p>' +
+    '</div>';
 }
 
 function showEmptyState() {
   categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
 
   providersContainer.setAttribute(
     'aria-busy',
@@ -243,40 +313,35 @@ function showEmptyState() {
 
   providersContainer.innerHTML = '';
 
-  providersStatus.innerHTML = `
-    <div class="state-card state-empty">
-      <h2 class="state-title">
-        No hay proveedores disponibles
-      </h2>
+  providersStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+      '<h2 class="state-title">' +
+        'No hay proveedores disponibles' +
+      '</h2>' +
 
-      <p class="state-description">
-        No encontramos proveedores
-        para mostrar en este momento.
-      </p>
-    </div>
-  `;
+      '<p class="state-description">' +
+        'No encontramos proveedores para mostrar en este momento.' +
+      '</p>' +
+    '</div>';
 }
 
-function showFilteredEmptyState(
-  category
-) {
-  providersStatus.innerHTML = `
-    <div class="state-card state-empty">
-      <h2 class="state-title">
-        No encontramos proveedores
-      </h2>
+function showSearchEmptyState() {
+  providersStatus.innerHTML =
+    '<div class="state-card state-empty">' +
+      '<h2 class="state-title">' +
+        'No encontramos coincidencias' +
+      '</h2>' +
 
-      <p class="state-description">
-        No hay proveedores disponibles
-        para la categoría
-        "${escapeHtml(category)}".
-      </p>
-    </div>
-  `;
+      '<p class="state-description">' +
+        'Prueba con otro nombre, servicio o categoría.' +
+      '</p>' +
+    '</div>';
 }
 
 function showErrorState() {
   categoryFilter.disabled = true;
+  providerSearch.disabled = true;
+  clearFiltersButton.disabled = true;
 
   providersContainer.setAttribute(
     'aria-busy',
@@ -285,34 +350,32 @@ function showErrorState() {
 
   providersContainer.innerHTML = '';
 
-  providersStatus.innerHTML = `
-    <div
-      class="state-card state-error"
-      role="alert"
-    >
-      <h2 class="state-title">
-        No pudimos cargar los proveedores
-      </h2>
+  providersStatus.innerHTML =
+    '<div ' +
+      'class="state-card state-error" ' +
+      'role="alert">' +
 
-      <p class="state-description">
-        Ocurrió un problema al obtener
-        la información.
-        Puedes intentar nuevamente.
-      </p>
+      '<h2 class="state-title">' +
+        'No pudimos cargar los proveedores' +
+      '</h2>' +
 
-      <button
-        class="button"
-        id="retry-providers"
-        type="button"
-      >
-        Reintentar
-      </button>
-    </div>
-  `;
+      '<p class="state-description">' +
+        'Ocurrió un problema al obtener la información. ' +
+        'Puedes intentar nuevamente.' +
+      '</p>' +
+
+      '<button ' +
+        'class="button" ' +
+        'id="retry-providers" ' +
+        'type="button">' +
+        'Reintentar' +
+      '</button>' +
+
+    '</div>';
 
   const retryButton =
-    document.querySelector(
-      '#retry-providers'
+    document.getElementById(
+      'retry-providers'
     );
 
   if (retryButton) {
@@ -343,7 +406,8 @@ function updateResultsCount(count) {
   }
 
   resultsCount.textContent =
-    count + ' proveedores encontrados';
+    count +
+    ' proveedores encontrados';
 }
 
 function renderProviders(providers) {
@@ -352,14 +416,15 @@ function renderProviders(providers) {
   const fragment =
     document.createDocumentFragment();
 
-  providers.forEach(function (provider) {
-    const card =
-      createProviderCard(
-        provider
+  providers.forEach(
+    function (provider) {
+      fragment.appendChild(
+        createProviderCard(
+          provider
+        )
       );
-
-    fragment.appendChild(card);
-  });
+    }
+  );
 
   providersContainer.appendChild(
     fragment
@@ -432,61 +497,76 @@ function createProviderCard(provider) {
 
   article.setAttribute(
     'aria-labelledby',
-    'provider-name-' + rawProviderId
+    'provider-name-' +
+      rawProviderId
   );
 
-  article.innerHTML = `
-    <div class="provider-card-header">
-      <div>
-        <p class="provider-category">
-          ${escapeHtml(category)}
-        </p>
+  article.innerHTML =
+    '<div class="provider-card-header">' +
 
-        <h2
-          class="provider-name"
-          id="provider-name-${escapeHtml(rawProviderId)}"
-        >
-          ${escapeHtml(name)}
-        </h2>
-      </div>
+      '<div>' +
 
-      <span
-        class="provider-status ${statusClass}"
-        aria-label="Estado del proveedor: ${statusText}"
-      >
-        ${statusText}
-      </span>
-    </div>
+        '<p class="provider-category">' +
+          escapeHtml(category) +
+        '</p>' +
 
-    <p class="provider-location">
-      ${escapeHtml(location)}
-    </p>
+        '<h2 ' +
+          'class="provider-name" ' +
+          'id="provider-name-' +
+          escapeHtml(rawProviderId) +
+          '">' +
+          escapeHtml(name) +
+        '</h2>' +
 
-    <p class="provider-description">
-      ${escapeHtml(description)}
-    </p>
+      '</div>' +
 
-    <div class="provider-meta">
-      <span
-        class="provider-rating"
-        aria-label="Calificación ${rating.toFixed(1)} de 5"
-      >
-        ★ ${rating.toFixed(1)}
-      </span>
+      '<span ' +
+        'class="provider-status ' +
+        statusClass +
+        '" ' +
+        'aria-label="Estado del proveedor: ' +
+        escapeHtml(statusText) +
+        '">' +
+        escapeHtml(statusText) +
+      '</span>' +
 
-      <span>
-        ${escapeHtml(experience)}
-      </span>
-    </div>
+    '</div>' +
 
-    <a
-      class="button provider-action"
-      href="./detail.html?id=${providerId}"
-      aria-label="Ver detalle de ${escapeHtml(name)}"
-    >
-      Ver detalle
-    </a>
-  `;
+    '<p class="provider-location">' +
+      escapeHtml(location) +
+    '</p>' +
+
+    '<p class="provider-description">' +
+      escapeHtml(description) +
+    '</p>' +
+
+    '<div class="provider-meta">' +
+
+      '<span ' +
+        'class="provider-rating" ' +
+        'aria-label="Calificación ' +
+        rating.toFixed(1) +
+        ' de 5">' +
+        '★ ' +
+        rating.toFixed(1) +
+      '</span>' +
+
+      '<span>' +
+        escapeHtml(experience) +
+      '</span>' +
+
+    '</div>' +
+
+    '<a ' +
+      'class="button provider-action" ' +
+      'href="./detail.html?id=' +
+      providerId +
+      '" ' +
+      'aria-label="Ver perfil de ' +
+      escapeHtml(name) +
+      '">' +
+      'Ver perfil' +
+    '</a>';
 
   return article;
 }
@@ -495,12 +575,15 @@ function normalizeText(
   value,
   fallback
 ) {
-  const normalized =
-    String(
-      value == null
-        ? ''
-        : value
-    ).trim();
+  let normalized = '';
+
+  if (
+    value !== null &&
+    value !== undefined
+  ) {
+    normalized =
+      String(value).trim();
+  }
 
   return normalized || fallback;
 }
@@ -509,17 +592,19 @@ function normalizeRating(value) {
   const rating =
     Number(value);
 
-  if (!isFinite(rating)) {
+  if (isNaN(rating)) {
     return 0;
   }
 
-  return Math.min(
-    Math.max(
-      rating,
-      0
-    ),
-    5
-  );
+  if (rating < 0) {
+    return 0;
+  }
+
+  if (rating > 5) {
+    return 5;
+  }
+
+  return rating;
 }
 
 function normalizeExperience(value) {
@@ -527,7 +612,7 @@ function normalizeExperience(value) {
     Number(value);
 
   if (
-    !isFinite(experience) ||
+    isNaN(experience) ||
     experience < 0
   ) {
     return 'Experiencia no informada';
@@ -562,10 +647,12 @@ function initProvidersPage() {
     !providersContainer ||
     !providersStatus ||
     !categoryFilter ||
-    !resultsCount
+    !resultsCount ||
+    !providerSearch ||
+    !clearFiltersButton
   ) {
     console.error(
-      'No se encontraron los elementos necesarios para inicializar la página de proveedores.'
+      'No se encontraron los elementos necesarios para inicializar proveedores.'
     );
 
     return;
@@ -573,7 +660,17 @@ function initProvidersPage() {
 
   categoryFilter.addEventListener(
     'change',
-    handleCategoryChange
+    applyFilters
+  );
+
+  providerSearch.addEventListener(
+    'input',
+    applyFilters
+  );
+
+  clearFiltersButton.addEventListener(
+    'click',
+    clearFilters
   );
 
   loadProviders();

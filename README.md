@@ -1,44 +1,28 @@
-## Estado actual
+## Evaluación UX simulada
 
-Commit 09:
+Antes de ejecutar la validación formal con usuarios reales se realizó una evaluación simulada con cinco perfiles de usuario.
 
-- tres páginas funcionales;
-- datos desacoplados;
-- carga mediante `fetch()`;
-- estados loading, empty y error;
-- filtro dinámico;
-- detalle funcional;
-- diseño responsive;
-- compatibilidad móvil;
-- accesibilidad;
-- despliegue preparado en GitHub Pages;
-- protocolo para pruebas de usabilidad reales;
-- plantillas para cinco sesiones de evaluación.
+El recorrido evaluado fue:
 
-Pendiente:
+`Inicio → Proveedores → Plomería → Perfil → Contacto`
 
-- ejecutar las cinco pruebas reales;
-- consolidar resultados;
-- implementar al menos una mejora derivada del feedback;
-- Lighthouse;
-- deploy final/documentación final.
+Los principales hallazgos simulados fueron:
 
-## Despliegue
+- necesidad de búsqueda textual;
+- necesidad de una acción explícita para limpiar filtros;
+- preferencia por contacto mediante WhatsApp;
+- mayor claridad del texto "Ver perfil".
 
-ServiPy se publica mediante GitHub Pages.
+Como consecuencia se implementaron:
 
-La aplicación es completamente estática y no necesita proceso de compilación.
+- búsqueda por texto;
+- combinación de búsqueda y categoría;
+- botón "Limpiar filtros";
+- CTA "Ver perfil";
+- contacto por WhatsApp.
 
-Configuración:
+La revisión se encuentra documentada en:
 
-- rama: `main`;
-- carpeta: `/(root)`;
-- plataforma: GitHub Pages.
+`docs/user-testing/SIMULATED_TEST_RESULTS.md`
 
-URL pública:
-
-https://jrojaspy.github.io/penguin-challenge-02-devWeb/
-
-La documentación del despliegue se encuentra en:
-
-`docs/deployment/DEPLOYMENT.md`
+La evaluación simulada no sustituye las cinco pruebas con usuarios reales requeridas para la entrega.

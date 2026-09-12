@@ -16,10 +16,9 @@
   <title>ServiPy | Proveedores</title>
 
   <link
-  rel="stylesheet"
-  href="./css/styles.css"
+    rel="stylesheet"
+    href="./css/styles.css?v=10"
   >
-
 </head>
 
 <body>
@@ -78,33 +77,52 @@
 
     <section
       class="provider-controls"
-      aria-labelledby="filter-title"
+      aria-labelledby="filters-title"
     >
-      <div class="filter-group">
-        <label
-          id="filter-title"
-          for="category-filter"
-        >
-          Filtrar por categoría
-        </label>
+      <h2
+        id="filters-title"
+        class="sr-only"
+      >
+        Buscar y filtrar proveedores
+      </h2>
 
-        <select
-          id="category-filter"
-          name="category"
-          aria-describedby="filter-help"
-        >
-          <option value="all">
-            Todas las categorías
-          </option>
-        </select>
+      <div class="provider-filters">
+        <div class="filter-group">
+          <label for="provider-search">
+            Buscar proveedor o servicio
+          </label>
 
-        <p
-          id="filter-help"
-          class="filter-help"
+          <input
+            id="provider-search"
+            type="search"
+            name="search"
+            placeholder="Ej.: plomería o Carlos"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="category-filter">
+            Filtrar por categoría
+          </label>
+
+          <select
+            id="category-filter"
+            name="category"
+          >
+            <option value="all">
+              Todas las categorías
+            </option>
+          </select>
+        </div>
+
+        <button
+          id="clear-filters"
+          class="button button-secondary"
+          type="button"
         >
-          Selecciona una categoría para reducir
-          el listado de proveedores.
-        </p>
+          Limpiar filtros
+        </button>
       </div>
 
       <p
@@ -149,8 +167,9 @@
       </p>
     </div>
   </footer>
+
   <script
-    src="./js/providers.js"
+    src="./js/providers.js?v=10"
     defer
   ></script>
 </body>
