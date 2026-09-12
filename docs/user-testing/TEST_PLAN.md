@@ -1,110 +1,131 @@
-# Plan de pruebas de usuario
+# Prueba de usabilidad
 
 ## Reto 02 — ServiPy
 
-Este documento define el procedimiento de evaluación de usabilidad de la aplicación.
+## Tipo de prueba
+
+Prueba moderada de usabilidad con cinco usuarios reales.
 
 ## Objetivo
 
-Evaluar si un usuario puede:
+Evaluar si una persona puede utilizar ServiPy para:
 
 1. comprender el propósito de la aplicación;
-2. encontrar un proveedor;
-3. identificar su categoría;
-4. interpretar su calificación;
-5. acceder al detalle;
-6. encontrar una forma de contacto.
+2. localizar proveedores;
+3. filtrar por categoría;
+4. revisar información de un proveedor;
+5. determinar cómo contactarlo.
 
----
+## Aplicación evaluada
 
-## Metodología
+URL pública:
 
-Se utilizarán cinco evaluadores.
+`PENDIENTE_URL_GITHUB_PAGES`
 
-Para cada evaluación se registrará:
+Todos los participantes utilizarán la misma versión publicada.
 
-- tarea asignada;
-- dificultad encontrada;
-- comentario del evaluador;
-- observación;
-- cambio propuesto;
-- cambio aplicado.
+## Escenario
 
----
+Se entrega la siguiente situación a cada participante:
 
-## Escenario de prueba
+> Necesitas encontrar un plomero en Asunción. Utiliza la aplicación para encontrar un proveedor, revisar su información y determinar cómo contactarlo.
 
-El evaluador recibe la siguiente situación:
+## Instrucciones al evaluador
 
-> Necesitas encontrar un plomero en Asunción.
-> Utiliza la aplicación para encontrar un proveedor,
-> revisar su información y determinar cómo contactarlo.
+No explicar previamente dónde se encuentra cada función.
 
----
+No indicar:
+
+- dónde está el filtro;
+- qué proveedor seleccionar;
+- dónde está el botón de detalle;
+- cómo encontrar el contacto.
+
+Solo intervenir si el participante queda completamente bloqueado.
 
 ## Tareas
 
 ### Tarea 1
 
-Desde la página de inicio, encontrar el listado de proveedores.
+Desde la página de inicio, encontrar la sección de proveedores.
 
 ### Tarea 2
 
-Identificar un proveedor de la categoría Plomería.
+Encontrar proveedores de la categoría Plomería.
 
 ### Tarea 3
 
-Revisar su calificación.
+Revisar los proveedores disponibles y seleccionar uno.
 
 ### Tarea 4
 
-Abrir el detalle del proveedor.
+Abrir la información detallada del proveedor.
 
 ### Tarea 5
 
-Encontrar una opción para contactarlo.
+Identificar:
 
----
+- calificación;
+- experiencia;
+- ubicación;
+- disponibilidad.
 
-## Métricas observadas
+### Tarea 6
 
-Para cada persona se observará:
+Determinar cómo contactar al proveedor.
 
-- comprensión inicial;
-- dificultad de navegación;
-- claridad visual;
-- ubicación del CTA;
-- comprensión de las tarjetas;
-- identificación de la calificación;
-- facilidad para regresar;
-- facilidad para encontrar contacto.
+## Escala de dificultad
 
----
+Registrar una puntuación de 1 a 5:
 
-## Registro de evaluadores
+- 1 = muy fácil;
+- 2 = fácil;
+- 3 = dificultad media;
+- 4 = difícil;
+- 5 = muy difícil.
 
-| Evaluador | Tarea | Dificultad | Comentario | Cambio propuesto | Cambio aplicado |
-|---|---|---|---|---|---|
+## Qué observar
+
+Durante la prueba registrar:
+
+- dudas;
+- errores;
+- retrocesos;
+- elementos que el usuario no encuentra;
+- interpretaciones incorrectas;
+- comentarios espontáneos;
+- acciones realizadas sin ayuda.
+
+## Regla para comentarios
+
+Los comentarios textuales deben registrarse literalmente.
+
+No corregir ni reinterpretar la frase del participante.
+
+## Participantes
+
+| Usuario | Dispositivo | Experiencia digital |
+|---|---|---|
+| Usuario 1 | Pendiente | Pendiente |
+| Usuario 2 | Pendiente | Pendiente |
+| Usuario 3 | Pendiente | Pendiente |
+| Usuario 4 | Pendiente | Pendiente |
+| Usuario 5 | Pendiente | Pendiente |
+
+## Resultados
+
+| Usuario | Tarea completada | Dificultad 1-5 | Comentario textual | Problema observado | Cambio propuesto |
+|---|---|---:|---|---|---|
 | Usuario 1 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | Usuario 2 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | Usuario 3 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | Usuario 4 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | Usuario 5 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 
----
+## Resultado global
+
+Pendiente de completar después de las cinco pruebas.
 
 ## Mejora obligatoria
 
-Al menos una observación obtenida durante las pruebas deberá producir una modificación real de la aplicación.
-
-La modificación será documentada en:
-
-`CHANGELOG.md`
-
----
-
-## Tipo de evaluación
-
-Durante el desarrollo puede utilizarse una simulación de perfiles de usuario para detectar problemas preliminares.
-
-Cuando una evaluación sea simulada deberá indicarse explícitamente como tal y no presentarse como una prueba realizada con una persona real.
+Al menos uno de los problemas identificados durante las pruebas será implementado en el siguiente commit y documentado en `CHANGELOG.md`.
