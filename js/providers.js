@@ -12,10 +12,11 @@ const resultsCount =
 
 let allProviders = [];
 
-/**
- * Carga los proveedores desde la fuente JSON.
- */
 async function loadProviders() {
+  console.log(
+    'ServiPy: iniciando carga de proveedores'
+  );
+
   showLoadingState();
 
   try {
@@ -33,9 +34,14 @@ async function loadProviders() {
 
     if (!Array.isArray(providers)) {
       throw new Error(
-        'La fuente de datos no contiene una lista válida de proveedores.'
+        'La fuente de datos no contiene una lista válida.'
       );
     }
+
+    console.log(
+      'ServiPy: proveedores cargados',
+      providers.length
+    );
 
     allProviders = providers;
 
@@ -79,30 +85,33 @@ async function loadProviders() {
   }
 }
 
-/**
- * Genera dinámicamente las categorías
- * a partir de los proveedores cargados.
- */
 function populateCategoryFilter(providers) {
   const currentValue =
     categoryFilter.value;
 
-  const categories = [
-    ...new Set(
-      providers
-        .map(
-          (provider) =>
-            provider.category
-        )
-        .filter(Boolean)
-    )
-  ].sort(
-    (a, b) =>
-      a.localeCompare(
-        b,
-        'es'
-      )
-  );
+  const categories = [];
+
+  providers.forEach((provider) => {
+    const category =
+      normalizeText(
+        provider.category,
+        ''
+      );
+
+    if (
+      category &&
+      categories.indexOf(category) === -1
+    ) {
+      categories.push(category);
+    }
+  });
+
+  categories.sort(function (a, b) {
+    return a.localeCompare(
+      b,
+      'es'
+    );
+  });
 
   categoryFilter.innerHTML = '';
 
@@ -117,29 +126,25 @@ function populateCategoryFilter(providers) {
     allOption
   );
 
-  categories.forEach(
-    (category) => {
-      const option =
-        document.createElement(
-          'option'
-        );
+  categories.forEach(function (category) {
+    const option =
+      document.createElement('option');
 
-      option.value = category;
-      option.textContent = category;
+    option.value = category;
+    option.textContent = category;
 
-      categoryFilter.appendChild(
-        option
-      );
-    }
-  );
+    categoryFilter.appendChild(
+      option
+    );
+  });
 
   if (
     currentValue &&
     (
       currentValue === 'all' ||
-      categories.includes(
+      categories.indexOf(
         currentValue
-      )
+      ) !== -1
     )
   ) {
     categoryFilter.value =
@@ -150,10 +155,6 @@ function populateCategoryFilter(providers) {
   }
 }
 
-/**
- * Devuelve proveedores filtrados
- * por categoría.
- */
 function filterProvidersByCategory(
   category
 ) {
@@ -162,15 +163,15 @@ function filterProvidersByCategory(
   }
 
   return allProviders.filter(
-    (provider) =>
-      provider.category === category
+    function (provider) {
+      return (
+        provider.category ===
+        category
+      );
+    }
   );
 }
 
-/**
- * Procesa el cambio del selector
- * de categoría.
- */
 function handleCategoryChange(event) {
   const selectedCategory =
     event.target.value;
@@ -183,8 +184,7 @@ function handleCategoryChange(event) {
   if (
     filteredProviders.length === 0
   ) {
-    providersContainer.innerHTML =
-      '';
+    providersContainer.innerHTML = '';
 
     showFilteredEmptyState(
       selectedCategory
@@ -206,9 +206,6 @@ function handleCategoryChange(event) {
   );
 }
 
-/**
- * Muestra el estado de carga.
- */
 function showLoadingState() {
   categoryFilter.disabled = true;
 
@@ -229,9 +226,6 @@ function showLoadingState() {
   `;
 }
 
-/**
- * Muestra el estado vacío general.
- */
 function showEmptyState() {
   categoryFilter.disabled = true;
 
@@ -251,10 +245,6 @@ function showEmptyState() {
   `;
 }
 
-/**
- * Muestra estado vacío para
- * un filtro específico.
- */
 function showFilteredEmptyState(
   category
 ) {
@@ -273,10 +263,6 @@ function showFilteredEmptyState(
   `;
 }
 
-/**
- * Muestra el estado de error
- * y permite reintentar.
- */
 function showErrorState() {
   categoryFilter.disabled = true;
 
@@ -320,17 +306,10 @@ function showErrorState() {
   }
 }
 
-/**
- * Limpia mensajes de estado.
- */
 function clearStatus() {
   providersStatus.innerHTML = '';
 }
 
-/**
- * Actualiza el contador
- * de proveedores visibles.
- */
 function updateResultsCount(count) {
   if (count === 0) {
     resultsCount.textContent =
@@ -347,40 +326,29 @@ function updateResultsCount(count) {
   }
 
   resultsCount.textContent =
-    `${count} proveedores encontrados`;
+    count + ' proveedores encontrados';
 }
 
-/**
- * Renderiza una colección
- * de proveedores.
- */
 function renderProviders(providers) {
   providersContainer.innerHTML = '';
 
   const fragment =
     document.createDocumentFragment();
 
-  providers.forEach(
-    (provider) => {
-      const card =
-        createProviderCard(
-          provider
-        );
-
-      fragment.appendChild(
-        card
+  providers.forEach(function (provider) {
+    const card =
+      createProviderCard(
+        provider
       );
-    }
-  );
+
+    fragment.appendChild(card);
+  });
 
   providersContainer.appendChild(
     fragment
   );
 }
 
-/**
- * Crea una tarjeta individual.
- */
 function createProviderCard(provider) {
   const article =
     document.createElement(
@@ -478,7 +446,7 @@ function createProviderCard(provider) {
       </span>
 
       <span>
-        ${experience}
+        ${escapeHtml(experience)}
       </span>
     </div>
 
@@ -494,27 +462,25 @@ function createProviderCard(provider) {
   return article;
 }
 
-/**
- * Normaliza valores de texto.
- */
 function normalizeText(
   value,
   fallback
 ) {
   const normalized =
-    String(value ?? '').trim();
+    String(
+      value == null
+        ? ''
+        : value
+    ).trim();
 
   return normalized || fallback;
 }
 
-/**
- * Normaliza rating entre 0 y 5.
- */
 function normalizeRating(value) {
   const rating =
     Number(value);
 
-  if (!Number.isFinite(rating)) {
+  if (!isFinite(rating)) {
     return 0;
   }
 
@@ -527,15 +493,12 @@ function normalizeRating(value) {
   );
 }
 
-/**
- * Normaliza la experiencia.
- */
 function normalizeExperience(value) {
   const experience =
     Number(value);
 
   if (
-    !Number.isFinite(experience) ||
+    !isFinite(experience) ||
     experience < 0
   ) {
     return 'Experiencia no informada';
@@ -544,43 +507,27 @@ function normalizeExperience(value) {
   const years =
     Math.floor(experience);
 
-  return `${years} ${
-    years === 1
-      ? 'año'
-      : 'años'
-  } de experiencia`;
+  return (
+    years +
+    ' ' +
+    (
+      years === 1
+        ? 'año'
+        : 'años'
+    ) +
+    ' de experiencia'
+  );
 }
 
-/**
- * Evita interpretar datos como HTML.
- */
 function escapeHtml(value) {
   return String(value)
-    .replaceAll(
-      '&',
-      '&amp;'
-    )
-    .replaceAll(
-      '<',
-      '&lt;'
-    )
-    .replaceAll(
-      '>',
-      '&gt;'
-    )
-    .replaceAll(
-      '"',
-      '&quot;'
-    )
-    .replaceAll(
-      "'",
-      '&#039;'
-    );
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-/**
- * Inicialización.
- */
 function initProvidersPage() {
   if (
     !providersContainer ||

@@ -2,48 +2,88 @@
 
 ## Estado actual
 
-## Estado actual
+Commit 07:
 
-Commit 06:
-
-- tres páginas funcionales;
-- fuente de datos desacoplada;
-- carga mediante `fetch()`;
-- listado dinámico;
-- estados loading / empty / error;
+- estructura inicial del proyecto;
+- tres páginas funcionales:
+  - Inicio;
+  - Proveedores;
+  - Detalle de proveedor;
+- fuente de datos desacoplada en `data/providers.json`;
+- carga de datos mediante `fetch()`;
+- renderizado dinámico de proveedores;
+- estados:
+  - loading;
+  - success;
+  - empty;
+  - error;
+- acción de reintento ante fallos;
 - filtro dinámico por categoría;
 - contador de resultados;
-- detalle dinámico del proveedor;
-- manejo de proveedor inexistente;
-- contacto funcional mediante `tel:`;
-- documentación de pruebas de usuario.
+- página de detalle dinámica mediante query string;
+- contacto funcional mediante enlaces `tel:`;
+- diseño responsive para:
+  - móvil;
+  - tablet;
+  - escritorio;
+- ajustes de compatibilidad para navegadores móviles;
+- fallback visual con Flexbox cuando Grid no está disponible o presenta incompatibilidades.
 
-Todavía no están completados:
+Todavía quedan pendientes:
 
-- ajustes finales responsive;
-- revisión de accesibilidad;
-- Lighthouse;
+- revisión específica de accesibilidad;
 - pruebas de usabilidad con cinco evaluadores;
 - mejoras derivadas del feedback;
-- deploy.
+- auditoría Lighthouse;
+- documentación final de rendimiento;
+- deploy público.
 
-## Detalle de proveedor
+## Estado actual
 
-Cada tarjeta enlaza a:
+Commit 07:
 
-`detail.html?id=:id`
+- estructura inicial del proyecto;
+- tres páginas funcionales:
+  - Inicio;
+  - Proveedores;
+  - Detalle de proveedor;
+- fuente de datos desacoplada en `data/providers.json`;
+- carga de datos mediante `fetch()`;
+- renderizado dinámico de proveedores;
+- estados:
+  - loading;
+  - success;
+  - empty;
+  - error;
+- acción de reintento ante fallos;
+- filtro dinámico por categoría;
+- contador de resultados;
+- página de detalle dinámica mediante query string;
+- contacto funcional mediante enlaces `tel:`;
+- diseño responsive para:
+  - móvil;
+  - tablet;
+  - escritorio;
+- ajustes de compatibilidad para navegadores móviles;
+- fallback visual con Flexbox cuando Grid no está disponible o presenta incompatibilidades.
 
-La página obtiene el identificador mediante `URLSearchParams`, carga la misma fuente `providers.json` y localiza el proveedor correspondiente.
+Todavía quedan pendientes:
 
-El detalle muestra:
+- revisión específica de accesibilidad;
+- pruebas de usabilidad con cinco evaluadores;
+- mejoras derivadas del feedback;
+- auditoría Lighthouse;
+- documentación final de rendimiento;
+- deploy público.
 
-- nombre;
-- categoría;
-- disponibilidad;
-- ubicación;
-- descripción;
-- rating;
-- experiencia;
-- contacto.
 
-Los proveedores disponibles muestran un enlace `tel:` para iniciar una llamada desde dispositivos compatibles.
+También te recomiendo agregar esta sección de ejecución en red local:
+
+## Pruebas desde dispositivos móviles
+
+La aplicación debe ejecutarse mediante HTTP.
+
+Desde la raíz del proyecto:
+
+```bash
+python -m http.server 5500 --bind 0.0.0.0
