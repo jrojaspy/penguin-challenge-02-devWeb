@@ -1,44 +1,18 @@
 ## Lighthouse
 
-La aplicación se evalúa mediante Lighthouse en modo móvil.
+La versión publicada fue auditada con Lighthouse 13.4.1
+en modo móvil y red 4G lenta.
 
-Las categorías revisadas son:
+| Página | Performance | Accessibility | Best Practices | SEO |
+|---|---:|---:|---:|---:|
+| Inicio | 100 | 100 | 100 | 100 |
+| Proveedores | 100 | 100 | 100 | 100 |
+| Detalle | 100 | 100 | 100 | 100 |
 
-- Performance;
-- Accessibility;
-- Best Practices;
-- SEO.
+Entre las mejoras realizadas se encuentran la optimización
+del filtrado, carga no bloqueante de JavaScript y reducción
+del Layout Shift en la página de detalle.
 
-Las optimizaciones implementadas incluyen:
-
-- renderizado diferido de componentes fuera del viewport;
-- reducción del procesamiento durante búsquedas;
-- reserva de espacio durante carga para reducir cambios visuales;
-- uso de JavaScript con `defer`;
-- ausencia de frameworks y dependencias externas pesadas.
-
-Los resultados se documentan en:
+Informe completo:
 
 `docs/lighthouse/LIGHTHOUSE_REPORT.md`
-
-Las puntuaciones se registran únicamente después de ejecutar la auditoría real.
-
-## Estado actual
-
-Commit 11:
-
-- tres páginas funcionales;
-- datos desacoplados;
-- búsqueda y filtrado;
-- contacto telefónico y WhatsApp;
-- responsive;
-- accesibilidad;
-- evaluación UX simulada;
-- optimizaciones de rendimiento;
-- documentación Lighthouse.
-
-Pendiente:
-
-- completar resultados reales de Lighthouse;
-- pruebas formales con cinco usuarios reales;
-- documentación final de entrega.

@@ -69,6 +69,11 @@ function loadProviders() {
           }
         );
 
+      /* Generar categorías dinámicamente */
+      populateCategoryFilter(
+        allProviders
+      );
+
       categoryFilter.disabled = false;
       providerSearch.disabled = false;
       clearFiltersButton.disabled = false;

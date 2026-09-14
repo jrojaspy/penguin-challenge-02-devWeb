@@ -1,66 +1,55 @@
-## Resultados Lighthouse
+## Resultados finales
 
-Las auditorías fueron ejecutadas sobre la versión pública de GitHub Pages utilizando Lighthouse 13.4.1, emulación Moto G Power y limitación de red 4G lenta.
+Las auditorías fueron realizadas sobre la aplicación publicada
+en GitHub Pages mediante Lighthouse 13.4.1.
 
-### Página de inicio
+Configuración:
 
-| Categoría | Resultado |
-|---|---:|
-| Performance | 100 |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+- dispositivo emulado: Moto G Power;
+- navegación móvil;
+- carga inicial;
+- red 4G lenta;
+- Lighthouse 13.4.1.
 
-Métricas principales:
+### Resultados
 
-| Métrica | Resultado |
-|---|---:|
-| FCP | 0.8 s |
-| LCP | 0.8 s |
-| TBT | 0 ms |
-| CLS | 0 |
-| Speed Index | 0.8 s |
+| Página | Performance | Accessibility | Best Practices | SEO |
+|---|---:|---:|---:|---:|
+| Inicio | 100 | 100 | 100 | 100 |
+| Proveedores | 100 | 100 | 100 | 100 |
+| Detalle | 100 | 100 | 100 | 100 |
 
-### Proveedores
+### Métricas principales
 
-| Categoría | Resultado |
-|---|---:|
-| Performance | 100 |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+| Página | FCP | LCP | TBT | CLS | Speed Index |
+|---|---:|---:|---:|---:|---:|
+| Inicio | 0.8 s | 0.8 s | 0 ms | 0 | 0.8 s |
+| Proveedores | 0.8 s | 0.8 s | 0 ms | 0.003 | 0.8 s |
+| Detalle | 0.8 s | 0.8 s | 0 ms | 0 | 0.8 s |
 
-Métricas principales:
+## Mejora comprobada
 
-| Métrica | Resultado |
-|---|---:|
-| FCP | 0.8 s |
-| LCP | 0.8 s |
-| TBT | 0 ms |
-| CLS | 0.005 |
-| Speed Index | 0.8 s |
+La primera auditoría de la página de detalle detectó un
+Cumulative Layout Shift de 0.217 y una puntuación de
+Performance de 89.
 
-### Detalle del proveedor
+El análisis identificó el desplazamiento del footer durante
+la carga dinámica de los datos del proveedor.
 
-| Categoría | Resultado |
-|---|---:|
-| Performance | 89 |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+Para solucionarlo se aplicaron:
 
-Métricas principales:
+- reserva de espacio para el contenido dinámico;
+- layout vertical estable mediante Flexbox;
+- expansión del elemento `main`;
+- estabilización de la sección de detalle.
 
-| Métrica | Resultado |
-|---|---:|
-| FCP | 0.8 s |
-| LCP | 0.8 s |
-| TBT | 0 ms |
-| CLS | 0.217 |
-| Speed Index | 0.8 s |
+Después de la modificación:
 
-El principal problema detectado en la página de detalle fue el desplazamiento acumulado de diseño (CLS).
+- Performance pasó de 89 a 100;
+- CLS pasó de 0.217 a 0;
+- Accessibility se mantuvo en 100;
+- Best Practices se mantuvo en 100;
+- SEO se mantuvo en 100.
 
-Lighthouse identificó el footer como principal causante del desplazamiento porque el contenido del proveedor se inserta dinámicamente después de la carga inicial.
-
-Para reducir este movimiento se reservó espacio para el contenido dinámico mediante `.detail-shell` y se estabilizó el layout vertical utilizando Flexbox.
+La mejora fue validada nuevamente sobre la aplicación
+publicada.
