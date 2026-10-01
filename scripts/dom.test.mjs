@@ -30,7 +30,7 @@ test("listado: cargando → éxito", async () => {
   const w = await mount("proveedores", "?delay=80");
   assert.match($(w, "state-region").textContent, /Cargando/);
   assert.equal($(w, "provider-list").getAttribute("aria-busy"), "true");
-  assert.equal(w.document.querySelectorAll(".skeleton-grid li").length, 6);
+  assert.equal(w.document.querySelectorAll("#provider-list .skeleton-card").length, 12);
   await sleep(250);
   assert.equal(titles(w).length, data.length);
   assert.equal($(w, "state-region").children.length, 0);

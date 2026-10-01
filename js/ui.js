@@ -63,6 +63,41 @@ export function loadingState(skeletonCount = 0) {
   return wrap;
 }
 
+// Skeletons con la misma geometría básica que las tarjetas reales.
+// Se insertan directamente en #provider-list para mantener estable el grid.
+export function loadingCards(count = 12) {
+  const cards = [];
+
+  for (let i = 0; i < count; i++) {
+    const card = el("li", "card skeleton-card");
+    card.setAttribute("aria-hidden", "true");
+
+    const head = el("div", "card__head");
+    head.append(
+      el("span", "skeleton skeleton--title"),
+      el("span", "skeleton skeleton--fav"),
+    );
+
+    const actions = el("div", "card__actions");
+    actions.append(
+      el("span", "skeleton skeleton--button"),
+      el("span", "skeleton skeleton--button"),
+    );
+
+    card.append(
+      head,
+      el("span", "skeleton skeleton--meta"),
+      el("span", "skeleton skeleton--rating"),
+      el("span", "skeleton skeleton--badge"),
+      actions,
+    );
+
+    cards.push(card);
+  }
+
+  return cards;
+}
+
 export const emptyState = (text = "Prueba con otra búsqueda o categoría.", onClear) =>
   createState({
     icon: "🔍", title: "Sin resultados", text, role: "status",

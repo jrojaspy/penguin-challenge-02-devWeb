@@ -7,7 +7,13 @@
 .skip-link:focus { top: var(--s2); }
 
 /* Header / nav / footer */
-.site-header { background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+/* El header se completa desde layout.js. Reservamos su altura desde el primer
+   paint para evitar que la inserción de la navegación desplace todo el <main>. */
+.site-header {
+  min-height: 4.3125rem; /* 69 px en escritorio */
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
 .site-header__inner {
   display: flex; flex-wrap: wrap; align-items: center;
   justify-content: space-between; gap: var(--s2); padding-block: var(--s3);
@@ -24,7 +30,10 @@
   color: var(--color-primary); text-decoration: underline;
   text-underline-offset: 6px; text-decoration-thickness: 2px;
 }
+/* El footer también se completa desde JS. La altura mínima evita un pequeño
+   desplazamiento cuando aparece su texto. */
 .site-footer {
+  min-height: 4.375rem;
   margin-top: var(--s12); padding-block: var(--s6);
   border-top: 1px solid var(--color-border); color: var(--color-muted); font-size: var(--fs-sm);
 }
@@ -125,13 +134,27 @@ input[type="checkbox"] { width: 1.5rem; min-height: 1.5rem; }
 .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgb(15 23 42 / 0.15); }
 
-/* Skeleton de carga */
-.skeleton-grid { margin-top: var(--s6); }
+/* Skeleton de carga
+   Reproduce la estructura real de una tarjeta (cabecera, metadata, rating,
+   disponibilidad y acciones). Así la lista ocupa prácticamente el mismo
+   espacio antes y después de recibir los datos y se reduce el CLS. */
 .skeleton {
   display: block; height: 1rem; border-radius: 0.375rem;
   background: linear-gradient(90deg, var(--color-border) 25%, var(--color-badge) 50%, var(--color-border) 75%);
   background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
 }
 .skeleton--title { height: 1.5rem; width: 70%; }
-.skeleton--short { width: 45%; }
+.skeleton--meta { width: 58%; }
+.skeleton--rating { width: 72%; }
+.skeleton--badge { width: 6.5rem; height: 1.625rem; border-radius: 999px; }
+.skeleton--fav { flex: none; width: 44px; height: 44px; border-radius: 50%; }
+.skeleton--button { flex: 1 1 8.5rem; min-height: 44px; border-radius: var(--radius); }
+.skeleton-card { min-height: 15rem; }
+.skeleton-card .card__actions { width: 100%; }
 @keyframes shimmer { to { background-position: -200% 0; } }
+
+/* En móvil la navegación se distribuye en dos líneas. Reservar la altura real
+   evita el salto de ~107 px detectado por Lighthouse. */
+@media (max-width: 47.99rem) {
+  .site-header { min-height: 6.6875rem; } /* 107 px */
+}

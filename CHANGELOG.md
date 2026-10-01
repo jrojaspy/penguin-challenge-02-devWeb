@@ -2,6 +2,14 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [SemVer](https://semver.org/lang/es/).
 
+
+## [1.1.1]
+### Performance
+- Se reservó la altura del header y footer generados por JavaScript para reducir desplazamientos de layout (CLS).
+- Se reemplazó el skeleton genérico por 12 skeleton cards con una geometría similar a las tarjetas finales.
+- Los skeletons se renderizan directamente dentro de `#provider-list`, manteniendo estable el grid durante la carga.
+- Se documentó la medición inicial de Lighthouse y se dejó preparada la comparación antes/después.
+
 ## [1.1.0]
 ### Changed
 - Se oscureció la paleta principal y se aumentó la diferenciación entre fondo, tarjetas y controles a partir del feedback de P1 y P3.

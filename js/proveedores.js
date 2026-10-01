@@ -1,5 +1,5 @@
 import { getProviders } from "./api.js";
-import { clear, loadingState, emptyState, errorState } from "./ui.js";
+import { clear, loadingState, loadingCards, emptyState, errorState } from "./ui.js";
 import { createCard } from "./card.js";
 import { filterProviders, sortProviders } from "./filters.js";
 import { getFavorites } from "./favorites.js";
@@ -96,7 +96,14 @@ async function init() {
   count.textContent = "";
   resetBtn.hidden = true;
   list.setAttribute("aria-busy", "true");
-  region.append(loadingState(6));
+
+  // El mensaje sigue disponible para tecnologías de asistencia, pero no ocupa
+  // espacio visual. Los 12 skeletons reservan el área del listado desde el
+  // primer render y evitan que el footer salte al llegar los datos.
+  const loading = loadingState(0);
+  loading.classList.add("visually-hidden");
+  region.append(loading);
+  list.append(...loadingCards(12));
   try {
     all = await getProviders();
     fillCategories();

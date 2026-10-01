@@ -1,33 +1,64 @@
 # Evidencia Lighthouse
 
-> **Pendiente de completar por ti** sobre el sitio ya desplegado (no en localhost).
+## Medición inicial — 1 de octubre de 2026
 
-## Cómo medir
-1. Abre la URL pública en ventana de incógnito (sin extensiones).
-2. DevTools → pestaña Lighthouse → modo *Mobile* → todas las categorías → *Analyze page load*.
-3. Repite 3 veces por página y anota la mediana.
-4. Guarda capturas en esta carpeta: `antes-*.png` y `despues-*.png`.
+Las pruebas se ejecutaron sobre la versión publicada en GitHub Pages, en modo móvil y escritorio.
 
-## Línea base y resultado
-| Página | Momento | Perf | A11y | BP | SEO | LCP | CLS |
-|---|---|---|---|---|---|---|---|
-| Inicio | antes | | | | | | |
-| Inicio | después | | | | | | |
-| Proveedores | antes | | | | | | |
-| Proveedores | después | | | | | | |
-| Detalle | antes | | | | | | |
-| Detalle | después | | | | | | |
+### Resultados
 
-> Para medir rendimiento real usa `?delay=0`: la latencia de 900 ms de `api.js` es simulada y penaliza LCP.
+| Página | Dispositivo | Performance | Accessibility | Best Practices | SEO | CLS |
+|---|---|---:|---:|---:|---:|---:|
+| Inicio | Móvil | 96 | 100 | 100 | 100 | 0.129 |
+| Proveedores | Móvil | 90 | 100 | 100 | 100 | 0.209 |
+| Registro | Móvil | 96 | 100 | 100 | 100 | 0.129 |
+| Inicio | Escritorio | 99 | 100 | 100 | 100 | 0.064 |
+| Proveedores | Escritorio | 95 | 100 | 100 | 100 | 0.143 |
+| Registro | Escritorio | 99 | 100 | 100 | 100 | 0.062 |
 
-## Mejoras candidatas ya presentes en el código
-Mídelas quitando/volviendo a poner cada una para tener un "antes" honesto:
-1. Favicon SVG (evita el 404 de `/favicon.ico` en consola, mejora Best Practices).
-2. `meta description` y `theme-color` por página (SEO).
-3. Sin fuentes web ni dependencias externas: fuentes del sistema (menos peticiones, mejor LCP).
-4. Contraste AA en modo claro y oscuro; nombres accesibles en botones (`aria-label`).
-5. Layout estable con skeleton de carga (menor CLS).
+## Diagnóstico
 
-## Mejoras aplicadas (rellenar)
-1. 
-2. 
+Lighthouse identificó desplazamientos de layout. Los reportes muestran que el elemento que se desplaza en Inicio y Registro es el `<main>`, mientras que en Proveedores se desplazan el `<main>` y el footer.
+
+La causa técnica identificada es doble:
+
+1. **Header generado por JavaScript:** el HTML inicial contiene un `<header>` vacío. `layout.js` agrega la navegación después del primer render, aumentando la altura del header y desplazando el contenido principal.
+2. **Listado dinámico de proveedores:** antes de recibir los datos el listado no reserva el mismo espacio que las 12 tarjetas finales, por lo que el footer cambia notablemente de posición.
+
+## Mejora 1 — Reserva de espacio del layout compartido
+
+Se agregó una altura mínima al header antes de que `layout.js` inserte la navegación:
+
+- escritorio: 69 px;
+- móvil: 107 px.
+
+También se reservó la altura mínima del footer. Esto evita que la inserción de header/footer modifique la geometría general después del primer paint.
+
+## Mejora 2 — Skeletons con geometría equivalente a las tarjetas
+
+El estado de carga ahora inserta **12 skeleton cards directamente en el mismo `#provider-list`** utilizado por los proveedores reales. Cada skeleton reproduce la estructura de una tarjeta:
+
+- cabecera;
+- favorito;
+- metadata;
+- rating;
+- disponibilidad;
+- dos acciones.
+
+El mensaje “Cargando proveedores…” permanece disponible para lectores de pantalla mediante una región visualmente oculta.
+
+De esta forma el grid ocupa desde el inicio un espacio similar al contenido final y el footer no necesita desplazarse de forma brusca.
+
+## Segunda medición
+
+Después de publicar estos cambios se debe volver a ejecutar Lighthouse y completar esta tabla:
+
+| Página | Dispositivo | Performance antes | Performance después | CLS antes | CLS después |
+|---|---|---:|---:|---:|---:|
+| Inicio | Móvil | 96 | — | 0.129 | — |
+| Proveedores | Móvil | 90 | — | 0.209 | — |
+| Registro | Móvil | 96 | — | 0.129 | — |
+| Inicio | Escritorio | 99 | — | 0.064 | — |
+| Proveedores | Escritorio | 95 | — | 0.143 | — |
+| Registro | Escritorio | 99 | — | 0.062 | — |
+
+> No completar las columnas “después” hasta realizar una nueva medición sobre la versión desplegada.
