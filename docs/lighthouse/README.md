@@ -83,4 +83,57 @@ Se aplicaron tres ajustes adicionales:
 
 Además, la latencia artificial por defecto se dejó en **0 ms**. Para demostrar el estado de carga durante una presentación se puede usar, por ejemplo, `?delay=900`.
 
-> Después de publicar este último ajuste conviene ejecutar una tercera medición de `proveedores.html` en móvil y escritorio para comprobar si el CLS baja de forma estable por debajo de 0,1. La evidencia obligatoria del challenge ya queda cubierta por las dos mediciones anteriores y sus mejoras reales.
+## Tercera medición — resultado final
+
+Después de publicar los skeletons prerenderizados y los últimos ajustes de geometría,
+se volvió a ejecutar Lighthouse sobre `proveedores.html` el **1 de octubre de 2026**.
+
+Se realizaron dos ejecuciones finales sobre la versión publicada. En ambas se obtuvo:
+
+| Métrica | Resultado final |
+|---|---:|
+| Performance | **100** |
+| Accessibility | **100** |
+| Best Practices | **100** |
+| SEO | **100** |
+| CLS | **0.000** |
+
+En una de las ejecuciones finales se registraron aproximadamente:
+
+- FCP: **0,9 s**
+- LCP: **0,9 s**
+- Speed Index: **0,9 s**
+- TBT: **10 ms**
+- CLS: **0.000**
+
+En la segunda ejecución:
+
+- FCP: **0,4 s**
+- LCP: **0,4 s**
+- Speed Index: **0,5 s**
+- TBT: **0 ms**
+- CLS: **0.000**
+
+### Evolución completa de `proveedores.html`
+
+| Etapa | Performance móvil | CLS móvil | Performance escritorio | CLS escritorio |
+|---|---:|---:|---:|---:|
+| Inicial | 90 | 0.209 | 95 | 0.143 |
+| Primera optimización | 97 | 0.100 | 97 | 0.109 |
+| Optimización final | **100** | **0.000** | **100** | **0.000** |
+
+### Conclusión técnica
+
+La optimización final eliminó el desplazamiento acumulado de layout en el listado.
+La mejora decisiva fue reservar la geometría **desde el HTML inicial**, evitando que
+JavaScript insertara el contenido de carga después del primer paint.
+
+La evidencia demuestra mejoras reales y medibles:
+
+1. eliminación del CLS en Inicio y Registro mediante reserva del espacio del layout;
+2. reducción progresiva y eliminación final del CLS en Proveedores mediante skeletons
+   equivalentes y prerenderizados;
+3. mejora de Performance de Proveedores móvil de **90 a 100**;
+4. mejora de Performance de Proveedores escritorio de **95 a 100**.
+
+Con esto se da por cerrada la optimización Lighthouse del challenge.

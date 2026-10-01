@@ -3,6 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [SemVer](https://semver.org/lang/es/).
 
 
+## [1.1.3]
+### Lighthouse
+- Se completó la tercera medición de `proveedores.html` después de prerenderizar los skeletons.
+- Performance alcanzó **100/100** en las dos ejecuciones finales analizadas.
+- Accessibility, Best Practices y SEO se mantienen en **100/100**.
+- CLS final de `proveedores.html`: **0.000**.
+- Evolución móvil: Performance **90 → 97 → 100** y CLS **0.209 → 0.100 → 0.000**.
+- Evolución escritorio: Performance **95 → 97 → 100** y CLS **0.143 → 0.109 → 0.000**.
+- Se actualizó `README.md` y `docs/lighthouse/README.md` con la evidencia final.
+
 ## [1.1.2]
 ### Performance
 - Se prerenderizaron 12 skeleton cards en `proveedores.html` para reservar el espacio del listado desde el HTML inicial y evitar el primer salto antes de ejecutar JavaScript.

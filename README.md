@@ -55,12 +55,37 @@ docs/  requisitos · pruebas de usabilidad · Lighthouse
 - **Registro local:** los proveedores registrados viven en `localStorage` (demo). Una API real sería el siguiente paso.
 
 ## Evidencia Lighthouse
-Ver [docs/lighthouse/README.md](docs/lighthouse/README.md). Se realizaron mediciones móvil/escritorio antes y después de optimizar CLS.
 
-- Inicio y Registro: CLS **0.000** después de la optimización.
-- Proveedores móvil: Performance **90 → 97**, CLS **0.209 → 0.100**.
-- Proveedores escritorio: Performance **95 → 97**, CLS **0.143 → 0.109**.
-- Accessibility, Best Practices y SEO: **100** en todas las páginas medidas.
+Ver [docs/lighthouse/README.md](docs/lighthouse/README.md).
+
+Se realizaron mediciones Lighthouse sobre la versión publicada en GitHub Pages antes y después de las optimizaciones de estabilidad visual.
+
+### Resultado final
+
+| Página | Dispositivo | Performance | Accessibility | Best Practices | SEO | CLS |
+|---|---|---:|---:|---:|---:|---:|
+| Inicio | Móvil | 100 | 100 | 100 | 100 | 0.000 |
+| Proveedores | Móvil | **100** | 100 | 100 | 100 | **0.000** |
+| Registro | Móvil | 100 | 100 | 100 | 100 | 0.000 |
+| Inicio | Escritorio | 100 | 100 | 100 | 100 | 0.000 |
+| Proveedores | Escritorio | **100** | 100 | 100 | 100 | **0.000** |
+| Registro | Escritorio | 100 | 100 | 100 | 100 | 0.000 |
+
+### Evolución de Proveedores
+
+- Performance móvil: **90 → 97 → 100**.
+- CLS móvil: **0.209 → 0.100 → 0.000**.
+- Performance escritorio: **95 → 97 → 100**.
+- CLS escritorio: **0.143 → 0.109 → 0.000**.
+
+Las mejoras principales fueron:
+
+1. reservar el espacio del header/footer generado por JavaScript;
+2. usar skeleton cards con geometría equivalente al contenido final;
+3. prerenderizar los skeletons en el HTML para reservar el espacio del grid desde el primer paint;
+4. reservar espacio para el contador de resultados.
+
+Con la última medición, `proveedores.html` alcanzó **100/100 en Performance** y **CLS 0.000** en las dos ejecuciones finales analizadas.
 
 ## Pruebas de usabilidad
 Ver [docs/pruebas-usabilidad.md](docs/pruebas-usabilidad.md) y [CHANGELOG.md](CHANGELOG.md). Se realizaron pruebas con **5 participantes** y se aplicaron mejoras de contraste, jerarquía visual, recuperación ante errores y estados sin resultados.
