@@ -3,6 +3,18 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [SemVer](https://semver.org/lang/es/).
 
 
+## [1.1.2]
+### Performance
+- Se prerenderizaron 12 skeleton cards en `proveedores.html` para reservar el espacio del listado desde el HTML inicial y evitar el primer salto antes de ejecutar JavaScript.
+- Se ajustó la altura de los skeletons por breakpoint para aproximar mejor la geometría de las tarjetas finales.
+- Se reservó una altura mínima para el contador de resultados y evitar desplazamientos al mostrar la cantidad de proveedores.
+- La latencia artificial de `api.js` pasó a **0 ms por defecto**; `?delay=N` queda disponible para demostrar el estado de carga.
+- En el manejo de error se limpia `#provider-list` para que no queden skeletons visibles junto al mensaje de error.
+
+### Lighthouse
+- Se documentó la segunda medición: Inicio y Registro alcanzaron CLS 0; Proveedores mejoró de 0.209 a 0.100 en móvil y de 0.143 a 0.109 en escritorio.
+- Performance de Proveedores mejoró de 90 a 97 en móvil y de 95 a 97 en escritorio.
+
 ## [1.1.1]
 ### Performance
 - Se reservó la altura del header y footer generados por JavaScript para reducir desplazamientos de layout (CLS).

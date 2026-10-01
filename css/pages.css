@@ -27,7 +27,7 @@
   display: grid; gap: var(--s4); align-items: end; margin-bottom: var(--s4);
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
-.results-count { margin-bottom: var(--s4); color: var(--color-muted); }
+.results-count { min-height: 1.5rem; margin-bottom: var(--s4); color: var(--color-muted); }
 
 .back-link { display: inline-flex; align-items: center; min-height: 44px; margin-block: var(--s4); }
 .detail {

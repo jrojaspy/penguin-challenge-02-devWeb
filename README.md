@@ -2,8 +2,8 @@
 
 App web para encontrar y calificar proveedores de servicios locales en Asunción. Proyecto del challenge CodePRO *La Batalla Final de la App de Servicios*.
 
-🔗 **Sitio desplegado:** _pega aquí tu URL pública_
-📦 **Repositorio:** _pega aquí tu URL de GitHub_
+🔗 **Sitio desplegado:** https://jrojaspy.github.io/penguin-challenge-02-devWeb/
+📦 **Repositorio:** https://github.com/jrojaspy/penguin-challenge-02-devWeb
 
 ## Características
 - **4 páginas:** Inicio, Proveedores, Detalle de proveedor y Registro de proveedores.
@@ -29,7 +29,7 @@ npm install && npm test   # opcional: ejecuta las pruebas (Node 20+)
 |---|---|
 | `?fail` | Fuerza el estado de **error** |
 | `?empty` | Fuerza el estado **sin resultados** |
-| `?delay=0` | Quita la latencia simulada (900 ms por defecto) |
+| `?delay=N` | Agrega N milisegundos de latencia simulada para observar el estado **Cargando** (por defecto: 0 ms) |
 
 ## Cómo desplegar
 **Netlify:** *Add new site → Import from Git*, build command vacío, publish directory `.`
@@ -55,10 +55,15 @@ docs/  requisitos · pruebas de usabilidad · Lighthouse
 - **Registro local:** los proveedores registrados viven en `localStorage` (demo). Una API real sería el siguiente paso.
 
 ## Evidencia Lighthouse
-Ver [docs/lighthouse/README.md](docs/lighthouse/README.md) — **pendiente de medir sobre el sitio desplegado**.
+Ver [docs/lighthouse/README.md](docs/lighthouse/README.md). Se realizaron mediciones móvil/escritorio antes y después de optimizar CLS.
+
+- Inicio y Registro: CLS **0.000** después de la optimización.
+- Proveedores móvil: Performance **90 → 97**, CLS **0.209 → 0.100**.
+- Proveedores escritorio: Performance **95 → 97**, CLS **0.143 → 0.109**.
+- Accessibility, Best Practices y SEO: **100** en todas las páginas medidas.
 
 ## Pruebas de usabilidad
-Ver [docs/pruebas-usabilidad.md](docs/pruebas-usabilidad.md) y [CHANGELOG.md](CHANGELOG.md) — **pendiente de ejecutar con 5 personas**.
+Ver [docs/pruebas-usabilidad.md](docs/pruebas-usabilidad.md) y [CHANGELOG.md](CHANGELOG.md). Se realizaron pruebas con **5 participantes** y se aplicaron mejoras de contraste, jerarquía visual, recuperación ante errores y estados sin resultados.
 
 ## Próximos pasos
 API real (Supabase/Firebase), reseñas por proveedor, login, mapa embebido.

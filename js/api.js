@@ -3,7 +3,7 @@ import { getStoredProviders } from "./storage.js";
 // Única capa que conoce de dónde vienen los datos.
 // Para pasar a una API real, solo se cambia DATA_URL / request().
 const DATA_URL = "./data/providers.json";
-const DEFAULT_DELAY_MS = 0; // latencia simulada para poder ver el estado "Cargando"
+const DEFAULT_DELAY_MS = 0; // producción: sin latencia artificial; usa ?delay=900 para demostrar el estado "Cargando"
 const TIMEOUT_MS = 8000;
 
 // Parámetros de prueba (solo lectura de la URL):

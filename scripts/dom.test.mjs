@@ -72,6 +72,7 @@ test("listado: estado de error con reintento", async () => {
   assert.ok(box, "hay role=alert");
   assert.match(box.textContent, /No pudimos cargar/);
   assert.match(box.textContent, /Comprueba tu conexión/);
+  assert.equal(w.document.querySelectorAll("#provider-list .skeleton-card").length, 0);
   const retry = box.querySelector("button");
   assert.equal(retry.textContent, "Reintentar");
   retry.click();

@@ -48,17 +48,39 @@ El mensaje “Cargando proveedores…” permanece disponible para lectores de p
 
 De esta forma el grid ocupa desde el inicio un espacio similar al contenido final y el footer no necesita desplazarse de forma brusca.
 
-## Segunda medición
+## Segunda medición — después de las primeras optimizaciones
 
-Después de publicar estos cambios se debe volver a ejecutar Lighthouse y completar esta tabla:
+Se volvió a ejecutar Lighthouse el **1 de octubre de 2026** sobre la versión desplegada.
 
 | Página | Dispositivo | Performance antes | Performance después | CLS antes | CLS después |
 |---|---|---:|---:|---:|---:|
-| Inicio | Móvil | 96 | — | 0.129 | — |
-| Proveedores | Móvil | 90 | — | 0.209 | — |
-| Registro | Móvil | 96 | — | 0.129 | — |
-| Inicio | Escritorio | 99 | — | 0.064 | — |
-| Proveedores | Escritorio | 95 | — | 0.143 | — |
-| Registro | Escritorio | 99 | — | 0.062 | — |
+| Inicio | Móvil | 96 | **100** | 0.129 | **0.000** |
+| Proveedores | Móvil | 90 | **97** | 0.209 | **0.100** |
+| Registro | Móvil | 96 | **100** | 0.129 | **0.000** |
+| Inicio | Escritorio | 99 | **100** | 0.064 | **0.000** |
+| Proveedores | Escritorio | 95 | **97** | 0.143 | **0.109** |
+| Registro | Escritorio | 99 | **100** | 0.062 | **0.000** |
 
-> No completar las columnas “después” hasta realizar una nueva medición sobre la versión desplegada.
+En las seis mediciones, **Accessibility, Best Practices y SEO obtuvieron 100/100**.
+
+### Resultado medible
+
+- El CLS de Inicio y Registro quedó completamente eliminado en móvil y escritorio.
+- El CLS de Proveedores móvil bajó aproximadamente **52 %** (`0.209 → 0.100`).
+- El CLS de Proveedores escritorio bajó aproximadamente **24 %** (`0.143 → 0.109`).
+- Performance de Proveedores móvil mejoró **7 puntos** (`90 → 97`).
+- Performance de Proveedores escritorio mejoró **2 puntos** (`95 → 97`).
+
+## Ajuste final a partir de la segunda medición
+
+La segunda medición mostró que el desplazamiento restante de `proveedores.html` seguía asociado principalmente al `footer` y al `#provider-list`. Se identificó una causa adicional: los skeletons se creaban con JavaScript, por lo que el HTML inicial todavía podía pintarse con el listado vacío antes de que el módulo agregara las tarjetas de carga.
+
+Se aplicaron tres ajustes adicionales:
+
+1. **Skeletons prerenderizados en `proveedores.html`:** las 12 tarjetas de carga existen desde el HTML inicial, antes de ejecutar JavaScript. No contienen datos de proveedores y solo reservan geometría.
+2. **Alturas de skeleton adaptadas al breakpoint:** 15 rem en móvil y 17,6 rem en escritorio, aproximando la altura observada de las filas finales.
+3. **Espacio reservado para el contador de resultados:** `.results-count` mantiene una altura mínima de 1,5 rem para evitar que su aparición desplace el grid.
+
+Además, la latencia artificial por defecto se dejó en **0 ms**. Para demostrar el estado de carga durante una presentación se puede usar, por ejemplo, `?delay=900`.
+
+> Después de publicar este último ajuste conviene ejecutar una tercera medición de `proveedores.html` en móvil y escritorio para comprobar si el CLS baja de forma estable por debajo de 0,1. La evidencia obligatoria del challenge ya queda cubierta por las dos mediciones anteriores y sus mejoras reales.

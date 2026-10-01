@@ -149,7 +149,7 @@ input[type="checkbox"] { width: 1.5rem; min-height: 1.5rem; }
 .skeleton--badge { width: 6.5rem; height: 1.625rem; border-radius: 999px; }
 .skeleton--fav { flex: none; width: 44px; height: 44px; border-radius: 50%; }
 .skeleton--button { flex: 1 1 8.5rem; min-height: 44px; border-radius: var(--radius); }
-.skeleton-card { min-height: 15rem; }
+.skeleton-card { min-height: 17.6rem; }
 .skeleton-card .card__actions { width: 100%; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
@@ -157,4 +157,5 @@ input[type="checkbox"] { width: 1.5rem; min-height: 1.5rem; }
    evita el salto de ~107 px detectado por Lighthouse. */
 @media (max-width: 47.99rem) {
   .site-header { min-height: 6.6875rem; } /* 107 px */
+  .skeleton-card { min-height: 15rem; }
 }

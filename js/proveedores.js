@@ -91,7 +91,6 @@ function render() {
 }
 
 async function init() {
-  clear(list);
   clear(region);
   count.textContent = "";
   resetBtn.hidden = true;
@@ -103,7 +102,13 @@ async function init() {
   const loading = loadingState(0);
   loading.classList.add("visually-hidden");
   region.append(loading);
-  list.append(...loadingCards(12));
+
+  // proveedores.html ya trae skeletons estáticos para reservar espacio antes
+  // de que se ejecute JavaScript. Si otro consumidor no los incluye, se
+  // generan como fallback sin duplicarlos.
+  if (!list.querySelector(".skeleton-card")) {
+    list.append(...loadingCards(12));
+  }
   try {
     all = await getProviders();
     fillCategories();
@@ -111,6 +116,7 @@ async function init() {
     render();
   } catch (error) {
     console.error(error);
+    clear(list);
     clear(region);
     region.append(errorState(init));
   } finally {

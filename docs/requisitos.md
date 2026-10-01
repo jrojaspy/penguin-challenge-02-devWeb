@@ -13,8 +13,8 @@
 - [x] Código organizado
 
 ## Proceso y entrega
-- [X] Lighthouse: 2+ mejoras con evidencia
-- [X] 5 pruebas con personas + 1 mejora aplicada
+- [ ] Lighthouse: 2+ mejoras con evidencia
+- [ ] 5 pruebas con personas + 1 mejora aplicada
 - [x] CHANGELOG.md, README (ejecutar, desplegar, Lighthouse)
 - [ ] Sitio desplegado + repositorio GitHub
 
