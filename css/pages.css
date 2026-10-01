@@ -1,0 +1,45 @@
+/* Estilos específicos de cada página */
+.hero { padding-block: var(--s12); background: linear-gradient(180deg, var(--color-hero), var(--color-bg)); }
+.hero__title { max-width: 20ch; }
+.hero__text { max-width: 55ch; font-size: var(--fs-lg); color: var(--color-muted); margin-bottom: var(--s6); }
+
+.section { padding-block: var(--s12); }
+.section--alt { background: var(--color-surface); }
+.features {
+  display: grid; gap: var(--s6); margin: 0; padding: 0; list-style: none;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+.feature { padding: var(--s6); background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+.feature h3 { margin-bottom: var(--s2); }
+.feature p { margin: 0; color: var(--color-muted); }
+.steps { display: grid; gap: var(--s4); margin: 0; padding: 0; list-style: none; counter-reset: paso; }
+.steps li { display: flex; align-items: center; gap: var(--s4); counter-increment: paso; font-size: var(--fs-lg); }
+.steps li::before {
+  content: counter(paso); flex: none; display: grid; place-items: center;
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: var(--color-primary); color: var(--color-on-primary); font-weight: 700;
+}
+.cta-band { text-align: center; }
+
+.page-head { padding-block: var(--s8) var(--s4); }
+.page-head p { color: var(--color-muted); margin: 0; }
+.filters {
+  display: grid; gap: var(--s4); align-items: end; margin-bottom: var(--s4);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.results-count { margin-bottom: var(--s4); color: var(--color-muted); }
+
+.back-link { display: inline-flex; align-items: center; min-height: 44px; margin-block: var(--s4); }
+.detail {
+  max-width: 44rem; padding: var(--s8); background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.detail__actions { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s6); }
+.related { margin-top: var(--s8); }
+
+.form-card {
+  display: grid; gap: var(--s4); max-width: 36rem; padding: var(--s8);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.trap { position: absolute; left: -9999px; }

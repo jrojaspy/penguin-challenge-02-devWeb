@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ofrece tus servicios | Servicios Asunción</title>
+  <meta name="description" content="Registra tu servicio para aparecer en el listado de proveedores de Asunción.">
+  <meta name="theme-color" content="#4338ca">
+  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/pages.css">
+</head>
+<body data-page="registro">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header" id="site-header"></header>
+
+  <main id="contenido" tabindex="-1">
+    <div class="container">
+      <div class="page-head">
+        <h1>Ofrece tus servicios</h1>
+        <p>Demo: tu registro se guarda solo en este navegador, sin servidor.</p>
+      </div>
+
+      <div id="state-region"></div>
+
+      <form id="register-form" class="form-card" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre o empresa</label>
+          <input id="nombre" name="nombre" type="text" autocomplete="organization" maxlength="60" required aria-describedby="nombre-error">
+          <p class="field__error" id="nombre-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="categoria">Categoría</label>
+          <input id="categoria" name="categoria" type="text" list="categorias" maxlength="40" required aria-describedby="categoria-hint categoria-error">
+          <datalist id="categorias"></datalist>
+          <p class="field__hint" id="categoria-hint">Elige una sugerida o escribe la tuya.</p>
+          <p class="field__error" id="categoria-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="zona">Zona de trabajo</label>
+          <input id="zona" name="zona" type="text" maxlength="40" required aria-describedby="zona-error">
+          <p class="field__error" id="zona-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="telefono-hint telefono-error">
+          <p class="field__hint" id="telefono-hint">Ej.: +595 981 123 456</p>
+          <p class="field__error" id="telefono-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="descripcion">Descripción del servicio</label>
+          <textarea id="descripcion" name="descripcion" rows="4" maxlength="300" required aria-describedby="descripcion-hint descripcion-error"></textarea>
+          <p class="field__hint" id="descripcion-hint">Entre 20 y 300 caracteres.</p>
+          <p class="field__error" id="descripcion-error" hidden></p>
+        </div>
+        <!-- Trampa anti-spam: los humanos no ven ni completan este campo -->
+        <div class="trap" aria-hidden="true">
+          <label for="website">No completar</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn--primary btn--lg">Registrar mi servicio</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+  <script type="module" src="./js/layout.js"></script>
+  <script type="module" src="./js/registro.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Detalle de proveedor | Servicios Asunción</title>
+  <meta name="description" content="Perfil completo del proveedor: calificación, zona, descripción y contacto directo.">
+  <meta name="theme-color" content="#4338ca">
+  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/pages.css">
+</head>
+<body data-page="detalle">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header" id="site-header"></header>
+
+  <main id="contenido" tabindex="-1">
+    <div class="container">
+      <a class="back-link" href="./proveedores.html">← Volver al listado</a>
+      <div id="state-region"></div>
+
+      <article id="provider-detail" class="detail" hidden aria-labelledby="detail-name">
+        <h1 id="detail-name"></h1>
+        <p id="detail-meta" class="card__meta"></p>
+        <div id="detail-rating"></div>
+        <p id="detail-status"></p>
+        <h2>Sobre este proveedor</h2>
+        <p id="detail-description"></p>
+        <div class="detail__actions">
+          <a id="detail-call" class="btn btn--primary btn--lg">Llamar ahora</a>
+          <a id="detail-map" class="btn btn--secondary btn--lg" target="_blank" rel="noopener noreferrer">Ver zona en el mapa</a>
+          <button id="share" type="button" class="btn btn--secondary btn--lg">Compartir</button>
+        </div>
+      </article>
+
+      <section id="related" class="related" hidden aria-labelledby="related-title">
+        <h2 id="related-title">Otros de la misma categoría</h2>
+        <ul id="related-list" class="grid"></ul>
+      </section>
+    </div>
+  </main>
+
+  <p id="toast" class="toast" role="status" hidden></p>
+  <footer class="site-footer" id="site-footer"></footer>
+  <script type="module" src="./js/layout.js"></script>
+  <script type="module" src="./js/detalle.js"></script>
+</body>
+</html>
